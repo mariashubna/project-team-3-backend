@@ -1,4 +1,4 @@
-import User from "../db/users.js";
+// import User from "../db/users.js";
 import HttpError from "../helpers/HttpError.js";
 
 export const findUser = (query) =>
