@@ -1,6 +1,6 @@
 import express from "express";
 import recipesController from "../controllers/recipesController.js";
-import validateRecipeBody from "../helpers/validateRecipeBody";
+import validateRecipeBody from "../helpers/validateRecipeBody.js";
 import validateBody from "../helpers/validateBody.js";
 import authenticate from "../middleware/authenticate.js";
 import upload from "../middleware/upload.js";
@@ -27,7 +27,6 @@ recipesRouter.post(
 
 recipesRouter.delete(
   "/:id",
-  isValidId,
   authenticate,
   recipesController.removeRecipeController
 );

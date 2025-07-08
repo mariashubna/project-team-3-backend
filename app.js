@@ -27,8 +27,6 @@ app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/testimonials", testimonialsRouter);
 app.use("/api/recipes", recipesRouter);
 
-categories;
-
 app.use(express.static("public"));
 
 app.use((_, res) => {

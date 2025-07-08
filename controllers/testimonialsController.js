@@ -1,12 +1,9 @@
-import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import { getAllTestimonials } from "../services/testimonialsServices.js";
 
-const getTestimonialsController = async (req, res, next) => {
-  // розписати сервіс getAllTestimonials
+const getTestimonials = async (req, res, next) => {
   const result = await getAllTestimonials();
   res.json(result);
 };
 
-export default {
-  getTestimonialsController: ctrlWrapper(getTestimonialsController),
-};
+export const getTestimonialsController = ctrlWrapper(getTestimonials);
