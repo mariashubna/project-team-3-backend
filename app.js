@@ -14,6 +14,9 @@ import {
   testimonialsRouter,
 } from "./routes/index.js";
 
+import { specs } from "./swagger.js";
+import swaggerUi from "swagger-ui-express";
+
 const app = express();
 
 app.use(morgan("tiny"));
@@ -28,6 +31,8 @@ app.use("/api/testimonials", testimonialsRouter);
 app.use("/api/recipes", recipesRouter);
 
 app.use(express.static("public"));
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
