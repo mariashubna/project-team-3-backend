@@ -93,6 +93,39 @@ recipesRouter.get("/", recipesController.getRecipesByFilterController);
 
 /**
  * @swagger
+ * /api/recipes/popular:
+ *   get:
+ *     summary: Get most popular recipes
+ *     tags: [Recipes]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: Most popular recipes list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Recipe'
+ *       500:
+ *         description: Internal server error
+ */
+recipesRouter.get("/popular", recipesController.getPopularController);
+
+/**
+ * @swagger
  * /api/recipes/{id}:
  *   get:
  *     summary: Get recipe by ID
@@ -133,8 +166,6 @@ recipesRouter.get("/", recipesController.getRecipesByFilterController);
  *                   example: "Internal server error"
  */
 recipesRouter.get("/:id", recipesController.getRecipeController);
-
-recipesRouter.get("/popular", recipesController.getPopularController);
 
 recipesRouter.post(
   "/",

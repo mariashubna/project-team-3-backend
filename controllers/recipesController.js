@@ -69,9 +69,25 @@ const getRecipeController = async (req, res) => {
   return res.json(mapToResponse(found));
 };
 
-// Популярні
-// +ПАГІНАЦІЯ
-const getPopularController = async (req, res) => {};
+const getPopularController = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const { count, rows } = await recipesService.getPopular({
+    skip,
+    limit: Number(limit),
+  });
+
+  const recieps = rows.map(mapToResponse);
+
+  res.json({
+    total: count,
+    totalPages: Math.ceil(count / Number(limit)),
+    page: Number(page),
+    limit: Number(limit),
+    recieps,
+  });
+};
 // Додати рецепт
 
 const addRecipeController = async (req, res) => {};

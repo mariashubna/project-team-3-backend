@@ -5,6 +5,8 @@ import Area from "../db/models/Area.js";
 import User from "../db/models/User.js";
 import Ingredient from "../db/models/Ingredient.js";
 import "../db/models/associations.js";
+import FavoriteRecipe from "../db/models/FavoriteRecipe.js";
+import sequelize from "../db/Sequelize.js";
 
 const emptyResponse = { count: 0, rows: [] };
 
@@ -115,6 +117,45 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
 export const findById = async ({ id }) => {
   return await Recipe.findOne({
     where: { id },
-    include: buildRecipiesAssosiations(),  
+    include: buildRecipiesAssosiations(),
   });
-}
+};
+
+export const getPopular = async ({ skip, limit }) => {
+  let rows = await FavoriteRecipe.findAll({
+    attributes: [
+      "recipeId",
+      [sequelize.fn("COUNT", sequelize.col("userId")), "count"],
+    ],
+    group: ["recipeId"],
+    order: [[sequelize.literal("count"), "DESC"]],
+    offset: skip,
+    limit,
+  });
+
+  const count = await FavoriteRecipe.count({
+    col: "recipeId",
+    distinct: true,
+  });
+
+  if (!count | !rows) {
+    return emptyResponse;
+  }
+
+  const ids = rows.map((r) => r.recipeId);
+
+  rows = await Recipe.findAll({
+    where: { id: ids },
+    include: buildRecipiesAssosiations(),
+    order: [
+      sequelize.literal(
+        `array_position(ARRAY[${ids.join(",")}]::int[], "recipe"."id")`
+      ),
+    ],
+  });
+
+  return {
+    count,
+    rows,
+  };
+};
