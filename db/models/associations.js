@@ -9,15 +9,16 @@ import UserFollowers from "./UserFollowers.js";
 import Testimonial from "./Testimonial.js";
 
 // belongsTo
-Recipe.belongsTo(Category, { foreignKey: "categoryId" });
-Recipe.belongsTo(Area, { foreignKey: "areaId" });
-Recipe.belongsTo(User, { foreignKey: "owner" });
+Recipe.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+Recipe.belongsTo(Area, { foreignKey: "areaId", as: "area" });
+Recipe.belongsTo(User, { foreignKey: "owner", as: "user" });
 
 // many-to-many
 Recipe.belongsToMany(Ingredient, {
   through: RecipeIngredient,
   foreignKey: "recipeId",
   otherKey: "ingredientId",
+  as: "ingredients",
 });
 Ingredient.belongsToMany(Recipe, {
   through: RecipeIngredient,

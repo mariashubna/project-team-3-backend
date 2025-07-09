@@ -11,6 +11,84 @@ import {
 
 const recipesRouter = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Recipes
+ *   description: Managing Recipes API
+ */
+
+/**
+ * @swagger
+ * /api/recipes/:
+ *   get:
+ *     summary: Search recipes by ingredient name, area name, category name and pagination
+ *     tags: [Recipes]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by category name (like and case-insensitive)
+ *       - in: query
+ *         name: ingredient
+ *         schema:
+ *           type: string
+ *         description: Filter by ingredient name (like and case-insensitive)
+ *       - in: query
+ *         name: area
+ *         schema:
+ *           type: string
+ *         description: Filter by area name (like and case-insensitive)
+ *       - in: query
+ *         name: ownerId
+ *         schema:
+ *           type: string
+ *         description: Filter by owner ID
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: Paginated results of recipes matching the given criteria
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of matching recipes
+ *                 totalPages:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 recipes:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Recipe'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong"
+ */
 recipesRouter.get("/", recipesController.getRecipesByFilterController);
 
 recipesRouter.get("/:id", recipesController.getRecipeController);
