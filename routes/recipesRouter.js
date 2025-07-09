@@ -136,6 +136,67 @@ recipesRouter.get("/:id", recipesController.getRecipeController);
 
 recipesRouter.get("/popular", recipesController.getPopularController);
 
+/**
+ * @swagger
+ * /api/recipes:
+ *   post:
+ *     summary: Create a new recipe
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - categoryId
+ *               - areaId
+ *               - instructions
+ *               - description
+ *               - time
+ *               - ingredients
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Classic Beef Lasagna"
+ *               categoryId:
+ *                 type: integer
+ *                 example: 3
+ *               areaId:
+ *                 type: integer
+ *                 example: 7
+ *               instructions:
+ *                 type: string
+ *                 example: "1. Brown the beef with onions and garlic. 2. Stir in tomato sauce and seasonings. Simmer for 15 minutes. 3. In a separate bowl, mix ricotta cheese, egg, and parsley. 4. Layer lasagna noodles, meat sauce, ricotta mixture, and mozzarella cheese in a baking dish. 5. Repeat layers. 6. Bake at 375°F (190°C) for 45 minutes until bubbly and golden brown. Let stand for 10 minutes before serving."
+ *               description:
+ *                 type: string
+ *                 example: "A rich and cheesy homemade lasagna with a savory beef and tomato sauce. Perfect for a family dinner."
+ *               time:
+ *                 type: string
+ *                 example: "90 minutes"
+ *               thumb:
+ *                 type: string
+ *                 format: binary
+ *                 description: "Recipe image file (optional)."
+ *               ingredients:
+ *                 type: string
+ *                 description: "A JSON string of an array of ingredients. Example: '[{\"id\": 265, \"measure\": \"1 pound\"}, {\"id\": 114, \"measure\": \"1 large\"}, {\"id\": 143, \"measure\": \"15 ounces\"}]'"
+ *                 example: "[{\"id\": 265, \"measure\": \"1 pound ground beef\"}, {\"id\": 114, \"measure\": \"1 chopped onion\"}, {\"id\": 143, \"measure\": \"1 (24 ounce) jar pasta sauce\"}, {\"id\": 23, \"measure\": \"15 ounces ricotta cheese\"}, {\"id\": 1, \"measure\": \"1 beaten egg\"}, {\"id\": 34, \"measure\": \"1/2 cup grated Parmesan cheese\"}, {\"id\": 10, \"measure\": \"12 lasagna noodles, cooked\"}, {\"id\": 25, \"measure\": \"4 cups shredded mozzarella cheese\"}]"
+ *     responses:
+ *       '201':
+ *         description: Recipe created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Recipe'
+ *       '400':
+ *         description: Bad request (validation error)
+ *       '401':
+ *         description: Unauthorized (token not provided or invalid)
+ */
 recipesRouter.post(
   "/",
   authenticate,

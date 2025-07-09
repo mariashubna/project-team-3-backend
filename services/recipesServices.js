@@ -4,6 +4,7 @@ import Category from "../db/models/Category.js";
 import Area from "../db/models/Area.js";
 import User from "../db/models/User.js";
 import Ingredient from "../db/models/Ingredient.js";
+import RecipeIngredient from "../db/models/RecipeIngredient.js";
 import "../db/models/associations.js";
 
 const emptyResponse = { count: 0, rows: [] };
@@ -118,3 +119,20 @@ export const findById = async ({ id }) => {
     include: buildRecipiesAssosiations(),  
   });
 }
+
+export const addRecipe = async (data) => {
+  const { ingredients, ...recipeData } = data;
+
+  const newRecipe = await Recipe.create(recipeData);
+
+  if (ingredients && ingredients.length > 0) {
+    const recipeIngredients = ingredients.map((ingredient) => ({
+      recipeId: newRecipe.id,
+      ingredientId: ingredient.id,
+      measure: ingredient.measure,
+    }));
+    await RecipeIngredient.bulkCreate(recipeIngredients);
+  }
+
+  return newRecipe;
+};

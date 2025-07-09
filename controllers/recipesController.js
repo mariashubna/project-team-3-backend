@@ -74,7 +74,18 @@ const getRecipeController = async (req, res) => {
 const getPopularController = async (req, res) => {};
 // Додати рецепт
 
-const addRecipeController = async (req, res) => {};
+const addRecipeController = async (req, res) => {
+  const { id: owner } = req.user;
+  let thumb = null;
+
+  if (req.file) {
+    thumb = req.file.path;
+  }
+
+  const newRecipe = await recipesService.addRecipe({ ...req.body, owner, thumb });
+
+  res.status(201).json(newRecipe);
+};
 
 // Видалити рецепт
 const removeRecipeController = async (req, res) => {};

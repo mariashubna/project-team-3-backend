@@ -28,15 +28,15 @@ const swaggerOptions = {
         Category: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
+            id: { type: "integer", example: 3 },
+            name: { type: "string", example: "Beef" },
           },
         },
         Area: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
+            id: { type: "integer", example: 7 },
+            name: { type: "string", example: "Italian" },
           },
         },
         Ingredient: {
@@ -52,21 +52,21 @@ const swaggerOptions = {
           type: "object",
           properties: {
             ingredient: { $ref: "#/components/schemas/Ingredient" },
-            measure: { type: "string" },
+            measure: { type: "string", example: "1 pound" },
           },
         },
         Recipe: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            title: { type: "string" },
+            id: { type: "integer", example: 101 },
+            title: { type: "string", example: "Classic Beef Lasagna" },
             category: {
               $ref: "#/components/schemas/Category",
             },
-            instructions: { type: "string" },
-            description: { type: "string" },
-            image: { type: "string" },
-            time: { type: "string" },
+            instructions: { type: "string", example: "1. Brown the beef with onions and garlic. 2. Stir in tomato sauce and seasonings..." },
+            description: { type: "string", example: "A rich and cheesy homemade lasagna with a savory beef and tomato sauce." },
+            image: { type: "string", example: "/uploads/recipes/lasagna.jpg" },
+            time: { type: "string", example: "90 minutes" },
             owner: { $ref: "#/components/schemas/User" },
             ingredients: {
               type: "array",
