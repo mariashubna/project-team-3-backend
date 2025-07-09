@@ -75,6 +75,13 @@ const swaggerOptions = {
             area: { $ref: "#/components/schemas/Area" },
           },
         },
+        Testimonials: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            testimonial: { type: "string" },
+          },
+        },
       },
     },
     info: {
