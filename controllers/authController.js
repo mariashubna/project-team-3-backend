@@ -14,14 +14,6 @@ import {
 
 import { saveAvatarToPublic } from "../helpers/saveAvatarFiles.js";
 
-// для зміни аватара
-
-// import { rename } from "node:fs/promises";
-// import { resolve, join } from "node:path";
-
-// const avatarDir = resolve("public", "avatars");
-
-// Реєстрація
 
 const registerController = async (req, res, next) => {
   try {
@@ -39,13 +31,12 @@ const registerController = async (req, res, next) => {
 };
 
 
-// Логін
 const loginController = async (req, res, next) => {
   const { token, user } = await loginUser(req.body);
   res.json({ token, user });
 };
 
-// Current
+
 const getCurrentController = async (req, res, next) => {
   const { email, avatar, name } = req.user;
   res.json({
@@ -54,7 +45,8 @@ const getCurrentController = async (req, res, next) => {
     name,
   });
 };
-// отримання детальної інформації про користувача
+
+
 const getDetailsController = async (req, res, next) => {
   const currentUserId = req.user.id;
   const targetUserId = req.params.userId;
@@ -63,7 +55,6 @@ const getDetailsController = async (req, res, next) => {
   res.json(userDetails);
 };
 
-// Зміна аватарки
 
 const avatarsController = async (req, res, next) => {
   const { id } = req.user;
@@ -81,10 +72,9 @@ const avatarsController = async (req, res, next) => {
   });
 };
 
-//  Фоловери
+
 const getFollowersController = async (req, res, next) => {
-  // код з  getFollowers;
-  const userId = req.params.userId;// req.user.id;або req.params.userId, залежно від маршруту
+  const userId = req.params.userId;
 
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
@@ -93,8 +83,7 @@ const getFollowersController = async (req, res, next) => {
 
   res.json(data);
 };
-//  отримання інформації щодо користувачів, за якими слідкує авторизований користувач
-// Пагінація можливо??
+
 
 const getFollowingController = async (req, res, next) => {
   const userId = req.user.id;
@@ -107,10 +96,9 @@ const getFollowingController = async (req, res, next) => {
   res.json(data);
 };
 
-// додавання користувача в перелік профілів, за якими слідкує авторизований користувач
 
 const followUserController = async (req, res, next) => {
-  // код з followUser;
+
   const userId = req.user.id;
   const targetUserId = req.params.userId;
 
@@ -118,9 +106,8 @@ const followUserController = async (req, res, next) => {
   res.status(200).json(result);
 };
 
-// видалення з слідкування
+
 const unfollowUserController = async (req, res, next) => {
-  // код з unfollowUser;
   const userId = req.user.id;
   const targetUserId = req.params.userId;
 

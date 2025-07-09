@@ -66,7 +66,6 @@ export const loginUser = async (payload = {}) => {
     };
   };
 
-
 export const getUserDetails = async (currentUserId, targetUserId) => {
   const user = await findUser({ id: targetUserId });
   if (!user) throw HttpError(404, "User not found");
@@ -177,7 +176,7 @@ export const getFollowing = async (userId, page = 1, limit = 5) => {
       const recipes = await followedUser.getRecipes({
         limit: 3,
         order: [["createdAt", "DESC"]],
-        attributes: ["image"],
+        attributes: ["thumb"],
       });
 
       return {
@@ -185,7 +184,7 @@ export const getFollowing = async (userId, page = 1, limit = 5) => {
         name: followedUser.name,
         avatar: followedUser.avatar,
         recipesCount: await followedUser.countRecipes(),
-        recipesPreview: recipes.map((r) => r.image),
+        recipesPreview: recipes.map((r) => r.thumb),
       };
     })
   );
