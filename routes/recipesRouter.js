@@ -91,6 +91,47 @@ const recipesRouter = express.Router();
  */
 recipesRouter.get("/", recipesController.getRecipesByFilterController);
 
+/**
+ * @swagger
+ * /api/recipes/{id}:
+ *   get:
+ *     summary: Get recipe by ID
+ *     tags: [Recipes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: id of the recipe
+ *     responses:
+ *       200:
+ *         description: Recipe found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *                $ref: '#/components/schemas/Recipe'
+ *       404:
+ *         description: Recipe not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recipe not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
 recipesRouter.get("/:id", recipesController.getRecipeController);
 
 recipesRouter.get("/popular", recipesController.getPopularController);
