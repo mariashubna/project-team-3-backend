@@ -53,3 +53,23 @@ User.belongsToMany(User, {
 
 Testimonial.belongsTo(User, { foreignKey: "owner", as: "user" });
 User.hasMany(Testimonial, { foreignKey: "owner", as: "testimonials" });
+
+User.hasMany(Recipe, { foreignKey: "owner", as: "recipes" });
+
+Recipe.hasMany(RecipeIngredient, {
+  foreignKey: "recipeId",
+  as: "recipeIngredients",
+});
+RecipeIngredient.belongsTo(Recipe, { foreignKey: "recipeId", as: "recipe" });
+
+User.hasMany(FavoriteRecipe, {
+  foreignKey: "userId",
+  as: "userfavoriteRecipes",
+});
+FavoriteRecipe.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+Recipe.hasMany(FavoriteRecipe, {
+  foreignKey: "recipeId",
+  as: "recipefavoriteRecipe",
+});
+FavoriteRecipe.belongsTo(Recipe, { foreignKey: "recipeId", as: "recipe" });
