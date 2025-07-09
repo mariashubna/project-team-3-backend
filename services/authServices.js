@@ -119,27 +119,31 @@ export const getFollowers = async (userId, page = 1, limit = 5) => {
     throw HttpError(404, "Not found");
   }
 
-  const rawFollowers = await user.getFollowers({
+  const followers = await user.getFollowers({
     offset,
     limit,
     attributes: ["id", "name", "avatar"],
   });
 
   //  кількість рецептів і 3 фото
-  const followers = await Promise.all(
-    rawFollowers.map(async (follower) => {
-      const recipes = await follower.getRecipes({
-        limit: 3,
-        order: [["createdAt", "DESC"]],
-        attributes: ["image"], // або photo залежить як поле назвемо
+  const result = await Promise.all(
+    followers.map(async (follower) => {
+      const recipeCount = await Recipe.count({
+        where: { owner:follower.id },
       });
+
+      const recipes = await Recipe.findAll({
+        where: { owner: follower.id },
+        attributes: ["thumb"],
+        limit: 3,
+      })
 
       return {
         id: follower.id,
         name: follower.name,
         avatar: follower.avatar,
-        recipesCount: await follower.countRecipes(),
-        recipesPreview: recipes.map((r) => r.image), // або r.photo
+        recipesCount: recipeCount,
+        recipesPreview: recipes.map((r) => r.thumb), 
       };
     })
   );
@@ -150,7 +154,7 @@ export const getFollowers = async (userId, page = 1, limit = 5) => {
     total: totalFollowers,
     page,
     limit,
-    followers,
+    followers: result,
   };
 };
 
