@@ -84,7 +84,7 @@ const avatarsController = async (req, res, next) => {
 //  Фоловери
 const getFollowersController = async (req, res, next) => {
   // код з  getFollowers;
-  const userId = req.user.id; // або req.params.userId, залежно від маршруту
+  const userId = req.params.userId;// req.user.id;або req.params.userId, залежно від маршруту
 
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
