@@ -20,7 +20,7 @@ const loadJSON = async (filename) => {
 const createIngredientIdMap = (ingredientsRaw, allIngredients) => {
   const map = {};
   for (const ing of ingredientsRaw) {
-    const mongoId = ing._id?.$oid || ing.id;
+    const mongoId = ing._id?.$oid || ing._id;
     if (mongoId) {
       const dbIngredient = allIngredients.find((i) => i.name === ing.name);
       if (dbIngredient) {

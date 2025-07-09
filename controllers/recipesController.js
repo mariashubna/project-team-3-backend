@@ -12,7 +12,18 @@ const getRecipesByFilterController = async (req, res) => {
     limit: Number(limit),
   });
 
-  const recieps = rows.map((recipe) => {
+  const recieps = rows.map(mapToResponse);
+
+  res.json({
+    total: count,
+    totalPages: Math.ceil(count / Number(limit)),
+    page: Number(page),
+    limit: Number(limit),
+    recieps,
+  });
+};
+
+const mapToResponse = (recipe) => {
     return {
       id: recipe.id,
       title: recipe.title,
@@ -44,19 +55,19 @@ const getRecipesByFilterController = async (req, res) => {
         name: recipe.area.name,
       },
     };
+  } 
+
+const getRecipeController = async (req, res) => {
+  const found = await recipesService.findById({
+    id: Number(req.params.id),
   });
 
-  res.json({
-    total: count,
-    totalPages: Math.ceil(count / Number(limit)),
-    page: Number(page),
-    limit: Number(limit),
-    recieps,
-  });
+  if (!found) {
+    throw HttpError(404, "Recipe not found");
+  }
+
+  return res.json(mapToResponse(found));
 };
-
-// Один рецепт
-const getRecipeController = async (req, res) => {};
 
 // Популярні
 // +ПАГІНАЦІЯ

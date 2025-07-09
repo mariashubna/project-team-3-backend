@@ -8,10 +8,8 @@ import "../db/models/associations.js";
 
 const emptyResponse = { count: 0, rows: [] };
 
-export const getRecipesByFilter = async ({ filter, skip, limit }) => {
-  const { category, ingredient, area, ownerId } = filter;
-
-  const include = [
+function buildRecipiesAssosiations() {
+  return [
     {
       model: Category,
       as: "category",
@@ -36,6 +34,12 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
       },
     },
   ];
+}
+
+export const getRecipesByFilter = async ({ filter, skip, limit }) => {
+  const { category, ingredient, area, ownerId } = filter;
+
+  const include = buildRecipiesAssosiations();
 
   const where = {};
 
@@ -107,3 +111,10 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
 
   return { count, rows };
 };
+
+export const findById = async ({ id }) => {
+  return await Recipe.findOne({
+    where: { id },
+    include: buildRecipiesAssosiations(),  
+  });
+}
