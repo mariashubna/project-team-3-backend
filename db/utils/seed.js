@@ -20,8 +20,8 @@ const loadJSON = async (filename) => {
 const createIngredientIdMap = (ingredientsRaw, allIngredients) => {
   const map = {};
   for (const ing of ingredientsRaw) {
-    const mongoId = ing._id?.$oid || ing.id;
-    if (mongoId) {
+    const mongoId = ing._id?.$oid || ing._id;
+    if (mongoId && !map[mongoId]) {
       const dbIngredient = allIngredients.find((i) => i.name === ing.name);
       if (dbIngredient) {
         map[mongoId] = dbIngredient;
@@ -121,7 +121,8 @@ const seed = async () => {
         ...(updatedAt && { updatedAt }),
       });
 
-      // Adding ingredients to the recipe
+      const recipeIngredientsToInsert = [];
+
       for (const ing of recipeIngs) {
         let dbIngredient = null;
         if (ing.id) {
@@ -131,9 +132,16 @@ const seed = async () => {
           dbIngredient = allIngredients.find((i) => i.name === ing.name);
         }
         if (!dbIngredient) continue;
-        await createdRecipe.addIngredient(dbIngredient, {
-          through: { measure: ing.measure },
+
+        recipeIngredientsToInsert.push({
+          recipeId: createdRecipe.id,
+          ingredientId: dbIngredient.id,
+          measure: ing.measure,
         });
+      }
+
+      if (recipeIngredientsToInsert.length) {
+        await RecipeIngredient.bulkCreate(recipeIngredientsToInsert);
       }
     }
 
