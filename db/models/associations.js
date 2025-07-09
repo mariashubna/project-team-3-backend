@@ -5,6 +5,8 @@ import User from "./User.js";
 import Ingredient from "./Ingredient.js";
 import RecipeIngredient from "./RecipeIngredient.js";
 import FavoriteRecipe from "./FavoriteRecipe.js";
+import UserFollowers from "./UserFollowers.js";
+import Testimonial from "./Testimonial.js";
 
 // belongsTo
 Recipe.belongsTo(Category, { foreignKey: "categoryId" });
@@ -33,3 +35,20 @@ User.belongsToMany(Recipe, {
   as: "favoriteRecipes",
   foreignKey: "userId",
 });
+
+User.belongsToMany(User, {
+  as: "followers",
+  through: UserFollowers,
+  foreignKey: "followingId",
+  otherKey: "followerId",
+});
+
+User.belongsToMany(User, {
+  as: "following",
+  through: UserFollowers,
+  foreignKey: "followerId",
+  otherKey: "followingId",
+});
+
+Testimonial.belongsTo(User, { foreignKey: "owner", as: "user" });
+User.hasMany(Testimonial, { foreignKey: "owner", as: "testimonials" });

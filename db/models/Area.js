@@ -1,4 +1,4 @@
-import sequelize from "../sequelize.js";
+import sequelize from "../Sequelize.js";
 import { DataTypes } from "sequelize";
 
 const Area = sequelize.define(
