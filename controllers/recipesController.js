@@ -2,9 +2,58 @@ import * as recipesService from "../services/recipesServices.js";
 import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
-// Рецепти всі + фільтр
-// +ПАГІНАЦІЯ
-const getRecipesByFilterController = async (req, res) => {};
+const getRecipesByFilterController = async (req, res) => {
+  const { page = 1, limit = 10, ...filter } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const { count, rows } = await recipesService.getRecipesByFilter({
+    filter,
+    skip,
+    limit: Number(limit),
+  });
+
+  const recieps = rows.map((recipe) => {
+    return {
+      id: recipe.id,
+      title: recipe.title,
+      category: {
+        id: recipe.category.id,
+        name: recipe.category.name,
+      },
+      instructions: recipe.instructions,
+      description: recipe.description,
+      image: recipe.image,
+      time: recipe.time,
+      owner: {
+        id: recipe.user.id,
+        name: recipe.user.name,
+        avatar: recipe.user.avatar,
+        email: recipe.user.email,
+      },
+      ingredients: recipe.ingredients.map((ingredient) => ({
+        ingredient: {
+          id: ingredient.id,
+          name: ingredient.name,
+          description: ingredient.desc,
+          image: ingredient.img,
+        },
+        measure: ingredient.recipe_ingredient.measure,
+      })),
+      area: {
+        id: recipe.area.id,
+        name: recipe.area.name,
+      },
+    };
+  });
+
+  res.json({
+    total: count,
+    totalPages: Math.ceil(count / Number(limit)),
+    page: Number(page),
+    limit: Number(limit),
+    recieps,
+  });
+};
 
 // Один рецепт
 const getRecipeController = async (req, res) => {};
