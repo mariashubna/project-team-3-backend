@@ -15,7 +15,3 @@ export const createRecipeSchema = Joi.object({
   category: Joi.string().required(),
   ingredients: Joi.array().items(ingredientsSchema).required(),
 });
-
-export const favoriteRecipe = Joi.object({
-  recipe: Joi.string().required(),
-});

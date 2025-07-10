@@ -12,14 +12,14 @@ const getRecipesByFilterController = async (req, res) => {
     limit: Number(limit),
   });
 
-  const recieps = rows.map(mapToResponse);
+  const recipes = rows.map(mapToResponse);
 
   res.json({
     total: count,
     totalPages: Math.ceil(count / Number(limit)),
     page: Number(page),
     limit: Number(limit),
-    recieps,
+    recipes,
   });
 };
 
@@ -69,9 +69,25 @@ const getRecipeController = async (req, res) => {
   return res.json(mapToResponse(found));
 };
 
-// Популярні
-// +ПАГІНАЦІЯ
-const getPopularController = async (req, res) => {};
+const getPopularController = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const { count, rows } = await recipesService.getPopular({
+    skip,
+    limit: Number(limit),
+  });
+
+  const recipes = rows.map(mapToResponse);
+
+  res.json({
+    total: count,
+    totalPages: Math.ceil(count / Number(limit)),
+    page: Number(page),
+    limit: Number(limit),
+    recipes,
+  });
+};
 // Додати рецепт
 
 const addRecipeController = async (req, res) => {
@@ -128,16 +144,68 @@ const getMyRecipeController = async (req, res) => {
   });
 };
 
-// Додати в улюблені
+const addFavoriteController = async (req, res) => {
+  const { id: recipeId } = req.params;
+  const userId = req.user.id;
 
-const addFavoriteController = async (req, res) => {};
+  const found = await recipesService.findById({ id: Number(recipeId) });
 
-// Видалити з улюблених
-const removeFavoriteController = async (req, res) => {};
+  if (!found) {
+    throw HttpError(404, "Recipe not found");
+  }
 
-// Отримати улюблені
-// +ПАГІНАЦІЯ
-const getMyFavoriteController = async (req, res) => {};
+  const favorite = await recipesService.addToFavorites({
+    recipeId: Number(recipeId),
+    userId,
+  });
+
+  res.json({
+    id: favorite.recipeId,
+  });
+
+};
+
+const removeFavoriteController = async (req, res) => {
+  const { id: recipeId } = req.params;
+  const userId = req.user.id;
+
+  const found = await recipesService.findById({ id: Number(recipeId) });
+
+  if (!found) {
+    throw HttpError(404, "Recipe not found");
+  }
+
+  const isDeleted = await recipesService.removeFromFavorites({
+    recipeId: Number(recipeId),
+    userId,
+  });
+
+  res.json({
+    id: isDeleted ? recipeId : null,
+  });
+};
+
+const getMyFavoriteController = async (req, res) => {
+  const userId = req.user.id;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const { count, rows } = await recipesService.getMyFavorites({
+    userId,
+    skip,
+    limit: Number(limit),
+  });
+
+  const recipes = rows.map(mapToResponse);
+
+  res.json({
+    total: count,
+    totalPages: Math.ceil(count / Number(limit)),
+    page: Number(page),
+    limit: Number(limit),
+    recipes,
+  });
+};
 
 export default {
   getRecipesByFilterController: ctrlWrapper(getRecipesByFilterController),

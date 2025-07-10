@@ -6,6 +6,8 @@ import User from "../db/models/User.js";
 import Ingredient from "../db/models/Ingredient.js";
 import RecipeIngredient from "../db/models/RecipeIngredient.js";
 import "../db/models/associations.js";
+import FavoriteRecipe from "../db/models/FavoriteRecipe.js";
+import sequelize from "../db/Sequelize.js";
 
 const emptyResponse = { count: 0, rows: [] };
 
@@ -116,8 +118,64 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
 export const findById = async ({ id }) => {
   return await Recipe.findOne({
     where: { id },
-    include: buildRecipiesAssosiations(),  
+    include: buildRecipiesAssosiations(),
   });
+};
+
+export const getPopular = async ({ skip, limit }) => {
+  let rows = await FavoriteRecipe.findAll({
+    attributes: [
+      "recipeId",
+      [sequelize.fn("COUNT", sequelize.col("userId")), "count"],
+    ],
+    group: ["recipeId"],
+    order: [[sequelize.literal("count"), "DESC"]],
+    offset: skip,
+    limit,
+  });
+
+  const count = await FavoriteRecipe.count({
+    col: "recipeId",
+    distinct: true,
+  });
+
+  if (!count | !rows) {
+    return emptyResponse;
+  }
+
+  const ids = rows.map((r) => r.recipeId);
+
+  rows = await getRecipesByIds(ids);
+
+  return {
+    count,
+    rows,
+  };
+};
+
+const getRecipesByIds = async (ids) => { 
+  return await Recipe.findAll({
+    where: { id: ids },
+    include: buildRecipiesAssosiations(),
+    order: [
+      sequelize.literal(
+        `array_position(ARRAY[${ids.join(",")}]::int[], "recipe"."id")`
+      ),
+    ],
+  });
+};
+
+export const addToFavorites = async ({ recipeId, userId }) => {
+  const [favorite, created] = await FavoriteRecipe.findOrCreate({
+    where: { recipeId, userId },
+    defaults: { recipeId, userId },
+  });
+
+  if (!created) {
+    return favorite;
+  }
+
+  return favorite;
 }
 
 export const addRecipe = async (data) => {
@@ -183,5 +241,28 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
     distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
   });
   
+  return { count, rows };
+};
+
+export const removeFromFavorites = async ({ recipeId, userId }) => {
+  const deleted = await FavoriteRecipe.destroy({
+    where: { recipeId, userId },
+  });
+
+  return deleted > 0;
+};
+
+export const getMyFavorites = async ({ userId, skip, limit }) => {
+  let {count, rows} = await FavoriteRecipe.findAndCountAll({
+    where: { userId },
+    attributes: ["recipeId"],
+    limit,
+    offset: skip,
+  });
+  
+  const ids = rows.map((r) => r.recipeId);
+
+  rows = await getRecipesByIds(ids);
+
   return { count, rows };
 };

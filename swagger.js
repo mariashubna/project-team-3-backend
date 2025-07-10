@@ -78,6 +78,12 @@ const swaggerOptions = {
             testimonial: { type: "string" },
           },
         },
+        Error: {
+          type: "object", 
+          properties: {
+            message: { type: "string" },
+          },
+        },
       },
     },
     info: {
