@@ -33,7 +33,7 @@ const mapToResponse = (recipe) => {
       },
       instructions: recipe.instructions,
       description: recipe.description,
-      image: recipe.image,
+      image: recipe.thumb, // Змінено з recipe.image на recipe.thumb для відповідності структурі даних
       time: recipe.time,
       owner: {
         id: recipe.user.id,
@@ -90,15 +90,60 @@ const getPopularController = async (req, res) => {
 };
 // Додати рецепт
 
-const addRecipeController = async (req, res) => {};
+const addRecipeController = async (req, res) => {
+  const { id: owner } = req.user;
+  let thumb = null;
+
+  if (req.file) {
+    thumb = req.file.path;
+  }
+
+  // Зберігаємо в базі як thumb, але в API відповіді буде image
+  const newRecipe = await recipesService.addRecipe({ ...req.body, owner, thumb });
+
+  res.status(201).json(newRecipe);
+};
 
 // Видалити рецепт
-const removeRecipeController = async (req, res) => {};
+const removeRecipeController = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  
+  const deletedRecipe = await recipesService.removeRecipeById(id, userId);
+  
+  if (!deletedRecipe) {
+    throw HttpError(404, "Recipe not found or you don't have permission to delete it");
+  }
+  
+  res.status(200).json({ message: "Recipe deleted successfully" });
+};
 
-// Отримати список своїх р-ів
+// Отримати список своїх рецептів
 // +ПАГІНАЦІЯ
-
-const getMyRecipeController = async (req, res) => {};
+const getMyRecipeController = async (req, res) => {
+  const { id: userId } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  
+  // Перетворюємо параметри на числа і перевіряємо на NaN
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  
+  // Якщо параметри не є числами, використовуємо значення за замовчуванням
+  const validPage = isNaN(pageNum) ? 1 : pageNum;
+  const validLimit = isNaN(limitNum) ? 10 : limitNum;
+  
+  const { count, rows } = await recipesService.getMyRecipes(userId, { page: validPage, limit: validLimit });
+  
+  // Використовуємо mapToResponse для форматування рецептів
+  const recipes = rows.map(mapToResponse);
+  
+  res.status(200).json({
+    count,
+    recipes,
+    currentPage: validPage,
+    totalPages: Math.ceil(count / validLimit),
+  });
+};
 
 const addFavoriteController = async (req, res) => {
   const { id: recipeId } = req.params;

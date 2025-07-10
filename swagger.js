@@ -28,51 +28,65 @@ const swaggerOptions = {
         Category: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
+            id: { type: "integer", example: 6 },
+            name: { type: "string", example: "Dessert" },
           },
         },
         Area: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
+            id: { type: "integer", example: 7 },
+            name: { type: "string", example: "British" },
           },
         },
         Ingredient: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
-            description: { type: "string" },
-            image: { type: "string" },
+            id: { type: "integer", example: 273 },
+            name: { type: "string", example: "Unsalted Butter" },
+            description: {
+              type: "string",
+              example:
+                "Butter made from cream that has been separated from milk and churned, without any added salt",
+            },
+            image: {
+              type: "string",
+              example:
+                "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e3828.png",
+            },
           },
         },
         IngredientMeasurement: {
           type: "object",
           properties: {
-            ingredient: { $ref: "#/components/schemas/Ingredient" },
-            measure: { type: "string" },
+            id: { type: "string", example: "273" },
+            measure: { type: "string", example: "175g" },
           },
         },
         Recipe: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            title: { type: "string" },
-            category: {
-              $ref: "#/components/schemas/Category",
+            id: { type: "integer", example: 287 },
+            title: { type: "string", example: "Ukrainian Borscht" },
+            categoryId: { type: "integer", example: 10 },
+            areaId: { type: "integer", example: 1 },
+            instructions: {
+              type: "string",
+              example:
+                "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions.",
             },
-            instructions: { type: "string" },
-            description: { type: "string" },
-            image: { type: "string" },
-            time: { type: "string" },
-            owner: { $ref: "#/components/schemas/User" },
-            ingredients: {
-              type: "array",
-              items: { $ref: "#/components/schemas/IngredientMeasurement" },
+            description: {
+              type: "string",
+              example: "Traditional Ukrainian borscht with cabbage and beets",
             },
-            area: { $ref: "#/components/schemas/Area" },
+            image: {
+              type: "string",
+              example: "/temp/1752106308896_199096356_receipt1.jpg",
+            },
+            time: { type: "string", example: "120" },
+            owner: { type: "integer", example: 5 },
+            createdAt: { type: "string", example: "2025-07-10T00:11:49.086Z" },
+            updatedAt: { type: "string", example: "2025-07-10T00:11:49.086Z" },
           },
         },
         Testimonials: {
@@ -83,7 +97,7 @@ const swaggerOptions = {
           },
         },
         Error: {
-          type: "object", 
+          type: "object",
           properties: {
             message: { type: "string" },
           },

@@ -4,6 +4,7 @@ import Category from "../db/models/Category.js";
 import Area from "../db/models/Area.js";
 import User from "../db/models/User.js";
 import Ingredient from "../db/models/Ingredient.js";
+import RecipeIngredient from "../db/models/RecipeIngredient.js";
 import "../db/models/associations.js";
 import FavoriteRecipe from "../db/models/FavoriteRecipe.js";
 import sequelize from "../db/Sequelize.js";
@@ -176,6 +177,72 @@ export const addToFavorites = async ({ recipeId, userId }) => {
 
   return favorite;
 }
+
+export const addRecipe = async (data) => {
+  const { ingredients, ...recipeData } = data;
+
+  const newRecipe = await Recipe.create(recipeData);
+
+  if (ingredients && ingredients.length > 0) {
+    const recipeIngredients = ingredients.map((ingredient) => ({
+      recipeId: newRecipe.id,
+      ingredientId: ingredient.id,
+      measure: ingredient.measure,
+    }));
+    await RecipeIngredient.bulkCreate(recipeIngredients);
+  }
+
+  return newRecipe;
+};
+
+// Видалити рецепт
+const removeRecipe = async (recipeId, userId) => {
+  // Перевіряємо, чи існує рецепт і чи належить він користувачу
+  const recipe = await Recipe.findOne({ 
+    where: { 
+      id: recipeId,
+      owner: userId 
+    } 
+  });
+  
+  if (!recipe) {
+    return null;
+  }
+  
+  // Видаляємо зв'язки з інгредієнтами
+  await RecipeIngredient.destroy({ where: { recipeId } });
+  
+  // Видаляємо сам рецепт
+  await recipe.destroy();
+  
+  return recipe;
+};
+
+export const removeRecipeById = removeRecipe;
+
+// Отримати власні рецепти користувача
+export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
+  // Перетворюємо параметри на числа і перевіряємо на NaN
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  
+  // Якщо параметри не є числами, використовуємо значення за замовчуванням
+  const validPage = isNaN(pageNum) ? 1 : pageNum;
+  const validLimit = isNaN(limitNum) ? 10 : limitNum;
+  
+  const skip = (validPage - 1) * validLimit;
+  
+  const { count, rows } = await Recipe.findAndCountAll({
+    where: { owner: userId },
+    include: buildRecipiesAssosiations(),
+    offset: skip,
+    limit: validLimit,
+    order: [["createdAt", "DESC"]],
+    distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
+  });
+  
+  return { count, rows };
+};
 
 export const removeFromFavorites = async ({ recipeId, userId }) => {
   const deleted = await FavoriteRecipe.destroy({

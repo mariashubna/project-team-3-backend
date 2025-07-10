@@ -11,7 +11,7 @@ import "../models/FavoriteRecipe.js";
 import "../models/associations.js";
 
 sequelize
-  .sync({ alter: true, force: true })
+  .sync({ alter: true })
   .then(() => {
     console.log("All models were synchronized successfully.");
     process.exit(0);

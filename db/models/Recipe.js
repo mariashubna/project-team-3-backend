@@ -34,7 +34,7 @@ const Recipe = sequelize.define(
     },
     thumb: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     time: {
       type: DataTypes.STRING,
