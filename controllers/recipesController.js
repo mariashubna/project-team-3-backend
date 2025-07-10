@@ -88,7 +88,18 @@ const addRecipeController = async (req, res) => {
 };
 
 // Видалити рецепт
-const removeRecipeController = async (req, res) => {};
+const removeRecipeController = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  
+  const deletedRecipe = await recipesService.removeRecipeById(id, userId);
+  
+  if (!deletedRecipe) {
+    throw HttpError(404, "Recipe not found or you don't have permission to delete it");
+  }
+  
+  res.status(200).json({ message: "Recipe deleted successfully" });
+};
 
 // Отримати список своїх р-ів
 // +ПАГІНАЦІЯ

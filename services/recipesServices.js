@@ -136,3 +136,28 @@ export const addRecipe = async (data) => {
 
   return newRecipe;
 };
+
+// Видалити рецепт
+const removeRecipe = async (recipeId, userId) => {
+  // Перевіряємо, чи існує рецепт і чи належить він користувачу
+  const recipe = await Recipe.findOne({ 
+    where: { 
+      id: recipeId,
+      owner: userId 
+    } 
+  });
+  
+  if (!recipe) {
+    return null;
+  }
+  
+  // Видаляємо зв'язки з інгредієнтами
+  await RecipeIngredient.destroy({ where: { recipeId } });
+  
+  // Видаляємо сам рецепт
+  await recipe.destroy();
+  
+  return recipe;
+};
+
+export const removeRecipeById = removeRecipe;

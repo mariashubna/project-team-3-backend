@@ -21,29 +21,10 @@ const validateRecipeBody = (schema) => {
     const categoriesList = await getAllCategories();
     const areasList = await getAllAreas();
 
-    // MongoDB ObjectIDs з JSON файлу
-    const availableMongoIngredients = ingredientsList.map(({ _id }) => {
-      return _id.toString();
-    });
-    
-    // Числові ID з CSV файлу
-    let availableNumericIngredients = [];
-    try {
-      const csvPath = path.resolve("ingredients.csv");
-      const csvData = await fs.readFile(csvPath, "utf-8");
-      const lines = csvData.split("\n").filter(line => line.trim());
-      
-      // Пропускаємо заголовок
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-        const match = line.match(/^(\d+),/);
-        if (match && match[1]) {
-          availableNumericIngredients.push(match[1]);
-        }
-      }
-    } catch (err) {
-      console.error("Error reading CSV file:", err);
-    }
+    // ID інгредієнтів з бази даних
+    const availableIngredientIds = ingredientsList.map((ingredient) => {
+      return ingredient.id ? ingredient.id.toString() : null;
+    }).filter(Boolean);
     
     const availableCategories = categoriesList.map(({ name }) => {
       return name;
@@ -53,13 +34,18 @@ const validateRecipeBody = (schema) => {
     });
 
     //  Перевірка інгрідієнтів
-    const parsedIngredients = Array.isArray(ingredients)
-      ? ingredients
-      : JSON.parse(ingredients);
+    let parsedIngredients;
+    try {
+      parsedIngredients = Array.isArray(ingredients)
+        ? ingredients
+        : JSON.parse(ingredients);
+    } catch (error) {
+      return next(HttpError(400, `Invalid JSON format for ingredients: ${error.message}`));
+    }
 
     parsedIngredients.forEach(({ id }) => {
-      // Перевіряємо як MongoDB ObjectID, так і числові ID
-      if (!availableMongoIngredients.includes(id) && !availableNumericIngredients.includes(id)) {
+      // Перевіряємо наявність інгредієнта в базі даних
+      if (!availableIngredientIds.includes(id.toString())) {
         return next(HttpError(409, `Ingredient with id ${id} not found`));
       }
     });

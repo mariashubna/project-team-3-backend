@@ -214,6 +214,54 @@ recipesRouter.post(
   recipesController.addRecipeController
 );
 
+/**
+ * @swagger
+ * /api/recipes/{id}:
+ *   delete:
+ *     summary: Delete own recipe
+ *     description: Delete a recipe that belongs to the authenticated user
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the recipe to delete
+ *     responses:
+ *       '200':
+ *         description: Recipe deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recipe deleted successfully"
+ *       '401':
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not authorized"
+ *       '404':
+ *         description: Recipe not found or you don't have permission to delete it
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recipe not found or you don't have permission to delete it"
+ */
 recipesRouter.delete(
   "/:id",
   authenticate,

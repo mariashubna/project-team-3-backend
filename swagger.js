@@ -58,22 +58,17 @@ const swaggerOptions = {
         Recipe: {
           type: "object",
           properties: {
-            id: { type: "integer", example: 1 },
+            id: { type: "integer", example: 287 },
             title: { type: "string", example: "Ukrainian Borscht" },
-            category: {
-              $ref: "#/components/schemas/Category",
-            },
+            categoryId: { type: "integer", example: 10 },
+            areaId: { type: "integer", example: 1 },
             instructions: { type: "string", example: "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions." },
             description: { type: "string", example: "Traditional Ukrainian borscht with cabbage and beets" },
-            thumb: { type: "string", example: "https://example.com/images/borscht.jpg" },
-            preview: { type: "string", example: "https://example.com/images/borscht-preview.jpg" },
+            thumb: { type: "string", example: "/temp/1752106308896_199096356_receipt1.jpg" },
             time: { type: "string", example: "120" },
-            owner: { $ref: "#/components/schemas/User" },
-            ingredients: {
-              type: "array",
-              items: { $ref: "#/components/schemas/IngredientMeasurement" },
-            },
-            area: { $ref: "#/components/schemas/Area" },
+            owner: { type: "integer", example: 5 },
+            createdAt: { type: "string", example: "2025-07-10T00:11:49.086Z" },
+            updatedAt: { type: "string", example: "2025-07-10T00:11:49.086Z" },
           },
         },
         Testimonials: {
