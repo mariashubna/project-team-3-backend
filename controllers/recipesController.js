@@ -24,38 +24,38 @@ const getRecipesByFilterController = async (req, res) => {
 };
 
 const mapToResponse = (recipe) => {
-    return {
-      id: recipe.id,
-      title: recipe.title,
-      category: {
-        id: recipe.category.id,
-        name: recipe.category.name,
+  return {
+    id: recipe.id,
+    title: recipe.title,
+    category: {
+      id: recipe.category.id,
+      name: recipe.category.name,
+    },
+    instructions: recipe.instructions,
+    description: recipe.description,
+    image: recipe.thumb, // Змінено з recipe.image на recipe.thumb для відповідності структурі даних
+    time: recipe.time,
+    owner: {
+      id: recipe.user.id,
+      name: recipe.user.name,
+      avatar: recipe.user.avatar,
+      email: recipe.user.email,
+    },
+    ingredients: recipe.ingredients.map((ingredient) => ({
+      ingredient: {
+        id: ingredient.id,
+        name: ingredient.name,
+        description: ingredient.desc,
+        image: ingredient.img,
       },
-      instructions: recipe.instructions,
-      description: recipe.description,
-      image: recipe.thumb, // Змінено з recipe.image на recipe.thumb для відповідності структурі даних
-      time: recipe.time,
-      owner: {
-        id: recipe.user.id,
-        name: recipe.user.name,
-        avatar: recipe.user.avatar,
-        email: recipe.user.email,
-      },
-      ingredients: recipe.ingredients.map((ingredient) => ({
-        ingredient: {
-          id: ingredient.id,
-          name: ingredient.name,
-          description: ingredient.desc,
-          image: ingredient.img,
-        },
-        measure: ingredient.recipe_ingredient.measure,
-      })),
-      area: {
-        id: recipe.area.id,
-        name: recipe.area.name,
-      },
-    };
-  } 
+      measure: ingredient.recipe_ingredient.measure,
+    })),
+    area: {
+      id: recipe.area.id,
+      name: recipe.area.name,
+    },
+  };
+};
 
 const getRecipeController = async (req, res) => {
   const found = await recipesService.findById({
@@ -99,7 +99,11 @@ const addRecipeController = async (req, res) => {
   }
 
   // Зберігаємо в базі як thumb, але в API відповіді буде image
-  const newRecipe = await recipesService.addRecipe({ ...req.body, owner, thumb });
+  const newRecipe = await recipesService.addRecipe({
+    ...req.body,
+    owner,
+    thumb,
+  });
 
   res.status(201).json(newRecipe);
 };
@@ -108,13 +112,16 @@ const addRecipeController = async (req, res) => {
 const removeRecipeController = async (req, res) => {
   const { id } = req.params;
   const { id: userId } = req.user;
-  
+
   const deletedRecipe = await recipesService.removeRecipeById(id, userId);
-  
+
   if (!deletedRecipe) {
-    throw HttpError(404, "Recipe not found or you don't have permission to delete it");
+    throw HttpError(
+      404,
+      "Recipe not found or you don't have permission to delete it"
+    );
   }
-  
+
   res.status(200).json({ message: "Recipe deleted successfully" });
 };
 
@@ -123,20 +130,23 @@ const removeRecipeController = async (req, res) => {
 const getMyRecipeController = async (req, res) => {
   const { id: userId } = req.user;
   const { page = 1, limit = 10 } = req.query;
-  
+
   // Перетворюємо параметри на числа і перевіряємо на NaN
   const pageNum = Number(page);
   const limitNum = Number(limit);
-  
+
   // Якщо параметри не є числами, використовуємо значення за замовчуванням
   const validPage = isNaN(pageNum) ? 1 : pageNum;
   const validLimit = isNaN(limitNum) ? 10 : limitNum;
-  
-  const { count, rows } = await recipesService.getMyRecipes(userId, { page: validPage, limit: validLimit });
-  
+
+  const { count, rows } = await recipesService.getMyRecipes(userId, {
+    page: validPage,
+    limit: validLimit,
+  });
+
   // Використовуємо mapToResponse для форматування рецептів
   const recipes = rows.map(mapToResponse);
-  
+
   res.status(200).json({
     count,
     recipes,
@@ -163,7 +173,6 @@ const addFavoriteController = async (req, res) => {
   res.json({
     id: favorite.recipeId,
   });
-
 };
 
 const removeFavoriteController = async (req, res) => {
