@@ -28,45 +28,46 @@ const swaggerOptions = {
         Category: {
           type: "object",
           properties: {
-            id: { type: "integer", example: 3 },
-            name: { type: "string", example: "Beef" },
+            id: { type: "integer", example: 6 },
+            name: { type: "string", example: "Dessert" },
           },
         },
         Area: {
           type: "object",
           properties: {
             id: { type: "integer", example: 7 },
-            name: { type: "string", example: "Italian" },
+            name: { type: "string", example: "British" },
           },
         },
         Ingredient: {
           type: "object",
           properties: {
-            id: { type: "integer" },
-            name: { type: "string" },
-            description: { type: "string" },
-            image: { type: "string" },
+            id: { type: "integer", example: 273 },
+            name: { type: "string", example: "Unsalted Butter" },
+            description: { type: "string", example: "Butter made from cream that has been separated from milk and churned, without any added salt" },
+            image: { type: "string", example: "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e3828.png" },
           },
         },
         IngredientMeasurement: {
           type: "object",
           properties: {
-            ingredient: { $ref: "#/components/schemas/Ingredient" },
-            measure: { type: "string", example: "1 pound" },
+            id: { type: "string", example: "273" },
+            measure: { type: "string", example: "175g" },
           },
         },
         Recipe: {
           type: "object",
           properties: {
-            id: { type: "integer", example: 101 },
-            title: { type: "string", example: "Classic Beef Lasagna" },
+            id: { type: "integer", example: 1 },
+            title: { type: "string", example: "Ukrainian Borscht" },
             category: {
               $ref: "#/components/schemas/Category",
             },
-            instructions: { type: "string", example: "1. Brown the beef with onions and garlic. 2. Stir in tomato sauce and seasonings..." },
-            description: { type: "string", example: "A rich and cheesy homemade lasagna with a savory beef and tomato sauce." },
-            image: { type: "string", example: "/uploads/recipes/lasagna.jpg" },
-            time: { type: "string", example: "90 minutes" },
+            instructions: { type: "string", example: "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions." },
+            description: { type: "string", example: "Traditional Ukrainian borscht with cabbage and beets" },
+            thumb: { type: "string", example: "https://example.com/images/borscht.jpg" },
+            preview: { type: "string", example: "https://example.com/images/borscht-preview.jpg" },
+            time: { type: "string", example: "120" },
             owner: { $ref: "#/components/schemas/User" },
             ingredients: {
               type: "array",
