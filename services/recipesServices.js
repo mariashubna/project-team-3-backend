@@ -144,7 +144,16 @@ export const getPopular = async ({ skip, limit }) => {
 
   const ids = rows.map((r) => r.recipeId);
 
-  rows = await Recipe.findAll({
+  rows = await getRecipesByIds(ids);
+
+  return {
+    count,
+    rows,
+  };
+};
+
+const getRecipesByIds = async (ids) => { 
+  return await Recipe.findAll({
     where: { id: ids },
     include: buildRecipiesAssosiations(),
     order: [
@@ -153,9 +162,40 @@ export const getPopular = async ({ skip, limit }) => {
       ),
     ],
   });
+};
 
-  return {
-    count,
-    rows,
-  };
+export const addToFavorites = async ({ recipeId, userId }) => {
+  const [favorite, created] = await FavoriteRecipe.findOrCreate({
+    where: { recipeId, userId },
+    defaults: { recipeId, userId },
+  });
+
+  if (!created) {
+    return favorite;
+  }
+
+  return favorite;
+}
+
+export const removeFromFavorites = async ({ recipeId, userId }) => {
+  const deleted = await FavoriteRecipe.destroy({
+    where: { recipeId, userId },
+  });
+
+  return deleted > 0;
+};
+
+export const getMyFavorites = async ({ userId, skip, limit }) => {
+  let {count, rows} = await FavoriteRecipe.findAndCountAll({
+    where: { userId },
+    attributes: ["recipeId"],
+    limit,
+    offset: skip,
+  });
+  
+  const ids = rows.map((r) => r.recipeId);
+
+  rows = await getRecipesByIds(ids);
+
+  return { count, rows };
 };
