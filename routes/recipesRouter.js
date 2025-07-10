@@ -91,6 +91,146 @@ const recipesRouter = express.Router();
  */
 recipesRouter.get("/", recipesController.getRecipesByFilterController);
 
+recipesRouter.get("/popular", recipesController.getPopularController);
+
+/**
+ * @swagger
+ * /api/recipes/myrecipes:
+ *   get:
+ *     summary: Get user's own recipes
+ *     description: Retrieve a list of recipes created by the authenticated user with pagination
+ *     tags: [Recipes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of recipes per page
+ *     responses:
+ *       '200':
+ *         description: A list of user's recipes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 1
+ *                   description: Total number of recipes
+ *                 recipes:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 288
+ *                       title:
+ *                         type: string
+ *                         example: "Ukrainian Borscht"
+ *                       category:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 10
+ *                           name:
+ *                             type: string
+ *                             example: "Miscellaneous"
+ *                       instructions:
+ *                         type: string
+ *                         example: "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions."
+ *                       description:
+ *                         type: string
+ *                         example: "Traditional Ukrainian borscht with cabbage and beets"
+ *                       image:
+ *                         type: string
+ *                         example: "/temp/1752110012880_166972169_receipt1.jpg"
+ *                       time:
+ *                         type: string
+ *                         example: "120"
+ *                       owner:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 5
+ *                           name:
+ *                             type: string
+ *                             example: "recetas"
+ *                           avatar:
+ *                             type: string
+ *                             example: "https://s.gravatar.com/avatar/828d27f5e9899b39881bfcac736dde89?s=250&d=robohash"
+ *                           email:
+ *                             type: string
+ *                             example: "1test@gmail.com"
+ *                       ingredients:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             ingredient:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                   example: 2
+ *                                 name:
+ *                                   type: string
+ *                                   example: "Cabbage"
+ *                                 description:
+ *                                   type: string
+ *                                   example: "A leafy green or purple vegetable that is often used in salads, coleslaw, and stir-fry dishes, and is also commonly fermented into sauerkraut."
+ *                                 image:
+ *                                   type: string
+ *                                   example: "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e37f5.png"
+ *                             measure:
+ *                               type: string
+ *                               example: "200g"
+ *                       area:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           name:
+ *                             type: string
+ *                             example: "Ukrainian"
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                   description: Current page number
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 1
+ *                   description: Total number of pages
+ *       '401':
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Not authorized"
+ */
+recipesRouter.get(
+  "/myrecipes",
+  authenticate,
+  recipesController.getMyRecipeController
+);
+
 /**
  * @swagger
  * /api/recipes/{id}:
@@ -133,8 +273,6 @@ recipesRouter.get("/", recipesController.getRecipesByFilterController);
  *                   example: "Internal server error"
  */
 recipesRouter.get("/:id", recipesController.getRecipeController);
-
-recipesRouter.get("/popular", recipesController.getPopularController);
 
 /**
  * @swagger
@@ -266,12 +404,6 @@ recipesRouter.delete(
   "/:id",
   authenticate,
   recipesController.removeRecipeController
-);
-
-recipesRouter.get(
-  "/myrecipes",
-  authenticate,
-  recipesController.getMyRecipeController
 );
 
 recipesRouter.post(

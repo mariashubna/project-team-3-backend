@@ -161,3 +161,27 @@ const removeRecipe = async (recipeId, userId) => {
 };
 
 export const removeRecipeById = removeRecipe;
+
+// Отримати власні рецепти користувача
+export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
+  // Перетворюємо параметри на числа і перевіряємо на NaN
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  
+  // Якщо параметри не є числами, використовуємо значення за замовчуванням
+  const validPage = isNaN(pageNum) ? 1 : pageNum;
+  const validLimit = isNaN(limitNum) ? 10 : limitNum;
+  
+  const skip = (validPage - 1) * validLimit;
+  
+  const { count, rows } = await Recipe.findAndCountAll({
+    where: { owner: userId },
+    include: buildRecipiesAssosiations(),
+    offset: skip,
+    limit: validLimit,
+    order: [["createdAt", "DESC"]],
+    distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
+  });
+  
+  return { count, rows };
+};

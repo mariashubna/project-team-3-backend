@@ -33,7 +33,7 @@ const mapToResponse = (recipe) => {
       },
       instructions: recipe.instructions,
       description: recipe.description,
-      image: recipe.image,
+      image: recipe.thumb, // Змінено з recipe.image на recipe.thumb для відповідності структурі даних
       time: recipe.time,
       owner: {
         id: recipe.user.id,
@@ -101,10 +101,32 @@ const removeRecipeController = async (req, res) => {
   res.status(200).json({ message: "Recipe deleted successfully" });
 };
 
-// Отримати список своїх р-ів
+// Отримати список своїх рецептів
 // +ПАГІНАЦІЯ
-
-const getMyRecipeController = async (req, res) => {};
+const getMyRecipeController = async (req, res) => {
+  const { id: userId } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  
+  // Перетворюємо параметри на числа і перевіряємо на NaN
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  
+  // Якщо параметри не є числами, використовуємо значення за замовчуванням
+  const validPage = isNaN(pageNum) ? 1 : pageNum;
+  const validLimit = isNaN(limitNum) ? 10 : limitNum;
+  
+  const { count, rows } = await recipesService.getMyRecipes(userId, { page: validPage, limit: validLimit });
+  
+  // Використовуємо mapToResponse для форматування рецептів
+  const recipes = rows.map(mapToResponse);
+  
+  res.status(200).json({
+    count,
+    recipes,
+    currentPage: validPage,
+    totalPages: Math.ceil(count / validLimit),
+  });
+};
 
 // Додати в улюблені
 
