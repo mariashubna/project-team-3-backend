@@ -32,8 +32,18 @@ export const registerUser = async (payload) => {
       password: hashedPassword,
       avatar,
     });
+    const tokenPayload = {
+      id: newUser.id,
+    };
 
-    return newUser;
+  const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "24h" });
+  
+  newUser.token = token;
+  await newUser.save();
+  
+
+
+  return { token, user: newUser, }
   };
 
 export const loginUser = async (payload = {}) => {

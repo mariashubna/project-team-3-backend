@@ -17,12 +17,13 @@ import { saveAvatarToPublic } from "../helpers/saveAvatarFiles.js";
 
 const registerController = async (req, res, next) => {
   try {
-    const newUser = await registerUser(req.body);
+    const {token, user} = await registerUser(req.body);
     res.status(201).json({
+      token,
       user: {
-        email: newUser.email,
-        name: newUser.name,
-        avatar: newUser.avatar,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
       },
     });
   } catch (err) {
