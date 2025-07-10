@@ -145,6 +145,8 @@ const usersRouter = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 token:
+ *                   type: string
  *                 user:
  *                   type: object
  *                   properties:
@@ -196,6 +198,12 @@ usersRouter.post(
  *                       type: string
  *                     avatar:
  *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
  *       401:
  *         description: Unauthorized
  */

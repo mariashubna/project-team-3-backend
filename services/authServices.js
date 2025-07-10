@@ -72,7 +72,15 @@ export const loginUser = async (payload = {}) => {
 
     return {
       token,
-      user: existingUser,
+      user: {
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        avatar: existingUser.avatar,
+        password: existingUser.password,
+        createdAt: existingUser.createdAt,
+        updatedAt: existingUser.updatedAt,
+      },
     };
   };
 
