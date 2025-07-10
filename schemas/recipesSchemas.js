@@ -10,7 +10,7 @@ export const createRecipeSchema = Joi.object({
   area: Joi.string().required(),
   instructions: Joi.string().required(),
   description: Joi.string().required(),
-  thumb: Joi.string().required(),
+  thumb: Joi.string().required(), // Зберігаємо назву поля thumb для сумісності з базою даних
   time: Joi.string().required(),
   category: Joi.string().required(),
   ingredients: Joi.array().items(ingredientsSchema).required(),

@@ -3,9 +3,7 @@ import recipesController from "../controllers/recipesController.js";
 import validateRecipeBody from "../helpers/validateRecipeBody.js";
 import authenticate from "../middleware/authenticate.js";
 import upload from "../middleware/upload.js";
-import {
-  createRecipeSchema,
-} from "../schemas/recipesSchemas.js";
+import { createRecipeSchema } from "../schemas/recipesSchemas.js";
 
 const recipesRouter = express.Router();
 
@@ -274,7 +272,6 @@ recipesRouter.get(
  */
 recipesRouter.get("/popular", recipesController.getPopularController);
 
-
 /**
  * @swagger
  * /api/recipes/myfavorites:
@@ -391,7 +388,7 @@ recipesRouter.get("/:id", recipesController.getRecipeController);
  *               - area
  *               - instructions
  *               - description
- *               - thumb
+ *               - image
  *               - time
  *               - ingredients
  *             properties:
@@ -410,7 +407,7 @@ recipesRouter.get("/:id", recipesController.getRecipeController);
  *               description:
  *                 type: string
  *                 example: "Traditional Ukrainian borscht with cabbage and beets"
- *               thumb:
+ *               image:
  *                 type: string
  *                 format: binary
  *                 description: The recipe's image file. Required.
@@ -604,6 +601,5 @@ recipesRouter.delete(
   authenticate,
   recipesController.removeFavoriteController
 );
-
 
 export default recipesRouter;

@@ -44,8 +44,16 @@ const swaggerOptions = {
           properties: {
             id: { type: "integer", example: 273 },
             name: { type: "string", example: "Unsalted Butter" },
-            description: { type: "string", example: "Butter made from cream that has been separated from milk and churned, without any added salt" },
-            image: { type: "string", example: "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e3828.png" },
+            description: {
+              type: "string",
+              example:
+                "Butter made from cream that has been separated from milk and churned, without any added salt",
+            },
+            image: {
+              type: "string",
+              example:
+                "https://ftp.goit.study/img/so-yummy/ingredients/640c2dd963a319ea671e3828.png",
+            },
           },
         },
         IngredientMeasurement: {
@@ -62,9 +70,19 @@ const swaggerOptions = {
             title: { type: "string", example: "Ukrainian Borscht" },
             categoryId: { type: "integer", example: 10 },
             areaId: { type: "integer", example: 1 },
-            instructions: { type: "string", example: "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions." },
-            description: { type: "string", example: "Traditional Ukrainian borscht with cabbage and beets" },
-            thumb: { type: "string", example: "/temp/1752106308896_199096356_receipt1.jpg" },
+            instructions: {
+              type: "string",
+              example:
+                "1. Boil a meat broth. 2. Prepare vegetables: cut cabbage, grate beets, cut celery. 3. Sauté celery. 4. Add all ingredients to the broth and cook until tender. 5. Serve with sour cream and green onions.",
+            },
+            description: {
+              type: "string",
+              example: "Traditional Ukrainian borscht with cabbage and beets",
+            },
+            image: {
+              type: "string",
+              example: "/temp/1752106308896_199096356_receipt1.jpg",
+            },
             time: { type: "string", example: "120" },
             owner: { type: "integer", example: 5 },
             createdAt: { type: "string", example: "2025-07-10T00:11:49.086Z" },
@@ -79,7 +97,7 @@ const swaggerOptions = {
           },
         },
         Error: {
-          type: "object", 
+          type: "object",
           properties: {
             message: { type: "string" },
           },

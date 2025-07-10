@@ -98,6 +98,7 @@ const addRecipeController = async (req, res) => {
     thumb = req.file.path;
   }
 
+  // Зберігаємо в базі як thumb, але в API відповіді буде image
   const newRecipe = await recipesService.addRecipe({ ...req.body, owner, thumb });
 
   res.status(201).json(newRecipe);
