@@ -441,7 +441,7 @@ recipesRouter.get("/:id", recipesController.getRecipeController);
 recipesRouter.post(
   "/",
   authenticate,
-  upload.single("thumb"),
+  upload.single("image"),
   validateRecipeBody(createRecipeSchema),
   recipesController.addRecipeController
 );
