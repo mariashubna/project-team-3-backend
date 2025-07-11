@@ -9,6 +9,6 @@ export const getAllIngredients = async () => {
     const data = await fs.readFile(ingredientsPath, "utf-8");
     return JSON.parse(data);
   } catch (err) {
-  throw HttpError(500, "Failed to load ingredients");
+    throw HttpError(500, "Failed to load ingredients");
   }
 };
