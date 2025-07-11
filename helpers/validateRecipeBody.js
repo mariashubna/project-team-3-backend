@@ -2,18 +2,30 @@ import HttpError from "./HttpError.js";
 import { getAllIngredients } from "../services/ingredientsServices.js";
 import { getAllCategories } from "../services/categoriesServices.js";
 import { getAllAreas } from "../services/areasServices.js";
+import fs from "fs/promises";
+import path from "path";
 
 const validateRecipeBody = (schema) => {
   return async (req, _, next) => {
     const { ingredients, category, area } = req.body;
 
+    // Додаємо шлях до файлу зображення в req.body.thumb, якщо файл завантажено
+    if (req.file) {
+      req.body.thumb = req.file.path;
+    } else {
+      // Якщо файл не завантажено, повертаємо помилку
+      return next(HttpError(400, "\"thumb\" is required"));
+    }
+
     const ingredientsList = await getAllIngredients();
     const categoriesList = await getAllCategories();
     const areasList = await getAllAreas();
 
-    const availableIngredients = ingredientsList.map(({ _id }) => {
-      return _id.toString();
-    });
+    // ID інгредієнтів з бази даних
+    const availableIngredientIds = ingredientsList.map((ingredient) => {
+      return ingredient.id ? ingredient.id.toString() : null;
+    }).filter(Boolean);
+    
     const availableCategories = categoriesList.map(({ name }) => {
       return name;
     });
@@ -22,12 +34,18 @@ const validateRecipeBody = (schema) => {
     });
 
     //  Перевірка інгрідієнтів
-    const parsedIngredients = Array.isArray(ingredients)
-      ? ingredients
-      : JSON.parse(ingredients);
+    let parsedIngredients;
+    try {
+      parsedIngredients = Array.isArray(ingredients)
+        ? ingredients
+        : JSON.parse(ingredients);
+    } catch (error) {
+      return next(HttpError(400, `Invalid JSON format for ingredients: ${error.message}`));
+    }
 
     parsedIngredients.forEach(({ id }) => {
-      if (!availableIngredients.includes(id)) {
+      // Перевіряємо наявність інгредієнта в базі даних
+      if (!availableIngredientIds.includes(id.toString())) {
         return next(HttpError(409, `Ingredient with id ${id} not found`));
       }
     });
@@ -48,9 +66,24 @@ const validateRecipeBody = (schema) => {
       );
     }
 
+    // Перевірка наявності файлу вже виконана вище
+    
     const { error } = schema.validate(req.body);
     if (error) {
       return next(HttpError(400, error.message));
+    }
+    
+    // Після валідації Joi додаємо ID категорії та регіону
+    // Знаходимо ID категорії за назвою
+    const categoryObj = categoriesList.find(cat => cat.name === category);
+    if (categoryObj) {
+      req.body.categoryId = categoryObj.id;
+    }
+
+    // Знаходимо ID регіону за назвою
+    const areaObj = areasList.find(a => a.name === area);
+    if (areaObj) {
+      req.body.areaId = areaObj.id;
     }
     next();
   };

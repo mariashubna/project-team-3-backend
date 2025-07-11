@@ -32,8 +32,18 @@ export const registerUser = async (payload) => {
       password: hashedPassword,
       avatar,
     });
+    const tokenPayload = {
+      id: newUser.id,
+    };
 
-    return newUser;
+  const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "24h" });
+  
+  newUser.token = token;
+  await newUser.save();
+  
+
+
+  return { token, user: newUser, }
   };
 
 export const loginUser = async (payload = {}) => {
@@ -62,10 +72,17 @@ export const loginUser = async (payload = {}) => {
 
     return {
       token,
-      user: existingUser,
+      user: {
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        avatar: existingUser.avatar,
+        password: existingUser.password,
+        createdAt: existingUser.createdAt,
+        updatedAt: existingUser.updatedAt,
+      },
     };
   };
-
 
 export const getUserDetails = async (currentUserId, targetUserId) => {
   const user = await findUser({ id: targetUserId });
@@ -119,27 +136,31 @@ export const getFollowers = async (userId, page = 1, limit = 5) => {
     throw HttpError(404, "Not found");
   }
 
-  const rawFollowers = await user.getFollowers({
+  const followers = await user.getFollowers({
     offset,
     limit,
     attributes: ["id", "name", "avatar"],
   });
 
   //  кількість рецептів і 3 фото
-  const followers = await Promise.all(
-    rawFollowers.map(async (follower) => {
-      const recipes = await follower.getRecipes({
-        limit: 3,
-        order: [["createdAt", "DESC"]],
-        attributes: ["image"], // або photo залежить як поле назвемо
+  const result = await Promise.all(
+    followers.map(async (follower) => {
+      const recipeCount = await Recipe.count({
+        where: { owner:follower.id },
       });
+
+      const recipes = await Recipe.findAll({
+        where: { owner: follower.id },
+        attributes: ["thumb"],
+        limit: 3,
+      })
 
       return {
         id: follower.id,
         name: follower.name,
         avatar: follower.avatar,
-        recipesCount: await follower.countRecipes(),
-        recipesPreview: recipes.map((r) => r.image), // або r.photo
+        recipesCount: recipeCount,
+        recipesPreview: recipes.map((r) => r.thumb), 
       };
     })
   );
@@ -150,7 +171,7 @@ export const getFollowers = async (userId, page = 1, limit = 5) => {
     total: totalFollowers,
     page,
     limit,
-    followers,
+    followers: result,
   };
 };
 
@@ -173,7 +194,7 @@ export const getFollowing = async (userId, page = 1, limit = 5) => {
       const recipes = await followedUser.getRecipes({
         limit: 3,
         order: [["createdAt", "DESC"]],
-        attributes: ["image"],
+        attributes: ["thumb"],
       });
 
       return {
@@ -181,7 +202,7 @@ export const getFollowing = async (userId, page = 1, limit = 5) => {
         name: followedUser.name,
         avatar: followedUser.avatar,
         recipesCount: await followedUser.countRecipes(),
-        recipesPreview: recipes.map((r) => r.image),
+        recipesPreview: recipes.map((r) => r.thumb),
       };
     })
   );

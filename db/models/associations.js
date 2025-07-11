@@ -9,15 +9,16 @@ import UserFollowers from "./UserFollowers.js";
 import Testimonial from "./Testimonial.js";
 
 // belongsTo
-Recipe.belongsTo(Category, { foreignKey: "categoryId" });
-Recipe.belongsTo(Area, { foreignKey: "areaId" });
-Recipe.belongsTo(User, { foreignKey: "owner" });
+Recipe.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+Recipe.belongsTo(Area, { foreignKey: "areaId", as: "area" });
+Recipe.belongsTo(User, { foreignKey: "owner", as: "user" });
 
 // many-to-many
 Recipe.belongsToMany(Ingredient, {
   through: RecipeIngredient,
   foreignKey: "recipeId",
   otherKey: "ingredientId",
+  as: "ingredients",
 });
 Ingredient.belongsToMany(Recipe, {
   through: RecipeIngredient,
@@ -52,3 +53,23 @@ User.belongsToMany(User, {
 
 Testimonial.belongsTo(User, { foreignKey: "owner", as: "user" });
 User.hasMany(Testimonial, { foreignKey: "owner", as: "testimonials" });
+
+User.hasMany(Recipe, { foreignKey: "owner", as: "recipes" });
+
+Recipe.hasMany(RecipeIngredient, {
+  foreignKey: "recipeId",
+  as: "recipeIngredients",
+});
+RecipeIngredient.belongsTo(Recipe, { foreignKey: "recipeId", as: "recipe" });
+
+User.hasMany(FavoriteRecipe, {
+  foreignKey: "userId",
+  as: "userfavoriteRecipes",
+});
+FavoriteRecipe.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+Recipe.hasMany(FavoriteRecipe, {
+  foreignKey: "recipeId",
+  as: "recipefavoriteRecipe",
+});
+FavoriteRecipe.belongsTo(Recipe, { foreignKey: "recipeId", as: "recipe" });

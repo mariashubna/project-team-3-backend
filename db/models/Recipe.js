@@ -1,8 +1,5 @@
 import sequelize from "../Sequelize.js";
 import { DataTypes } from "sequelize";
-import Category from "./Category.js";
-import Area from "./Area.js";
-import User from "./User.js";
 
 const Recipe = sequelize.define(
   "recipe",
@@ -37,7 +34,7 @@ const Recipe = sequelize.define(
     },
     thumb: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     time: {
       type: DataTypes.STRING,
