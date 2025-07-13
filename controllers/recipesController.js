@@ -105,7 +105,13 @@ const addRecipeController = async (req, res) => {
     thumb,
   });
 
-  res.status(201).json(newRecipe);
+  // Отримуємо повну інформацію про створений рецепт
+  const completeRecipe = await recipesService.findById({
+    id: newRecipe.id
+  });
+
+  // Використовуємо mapToResponse для форматування відповіді
+  res.status(201).json(mapToResponse(completeRecipe));
 };
 
 // Видалити рецепт
