@@ -116,10 +116,20 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
 };
 
 export const findById = async ({ id }) => {
-  return await Recipe.findOne({
-    where: { id },
+  const recipe = await Recipe.findByPk(id, {
     include: buildRecipiesAssosiations(),
   });
+
+  return recipe;
+};
+
+export const updateById = async (id, updateData) => {
+  const [updatedRowsCount, updatedRows] = await Recipe.update(updateData, {
+    where: { id },
+    returning: true,
+  });
+
+  return updatedRowsCount > 0 ? updatedRows[0] : null;
 };
 
 export const getPopular = async ({ skip, limit }) => {

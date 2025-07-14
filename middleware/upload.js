@@ -20,9 +20,14 @@ const limits = {
 
 const fileFilter = (req, file, cb) => {
   const extension = file.originalname.split(".").pop().toLowerCase();
-  if (extension === "exe") {
-    return cb(HttpError(400, ".exe extension not allow"));
+  
+  // Дозволяємо тільки зображення форматів .jpg, .jpeg та .png
+  const allowedExtensions = ["jpg", "jpeg", "png"];
+  
+  if (!allowedExtensions.includes(extension)) {
+    return cb(HttpError(400, `Unsupported file format. Allowed formats: ${allowedExtensions.join(", ")}`));
   }
+  
   cb(null, true);
 };
 
