@@ -21,5 +21,5 @@ Use this only for initial setup or development, not in production.
 To populate your database with initial data from the JSON files in `db/data`, run the following command from your project root:
 
 ```
-node db/utils/seed.
+node db/utils/seed.js
 ```
