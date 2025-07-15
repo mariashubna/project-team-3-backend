@@ -63,7 +63,16 @@ const seed = async () => {
 
     // 4. Users
     const users = await loadJSON("users.json");
-    await User.bulkCreate(users);
+    const defaultPassword =
+      "$2b$10$bFpf5Jp57HjL9iMxnityV.8v3qLQ5nlmv7ZlGBpRSEclmudNjr4j2";
+
+    // Add default password if not present
+    const usersWithPasswords = users.map((user) => ({
+      ...user,
+      password: user.password || defaultPassword,
+    }));
+
+    await User.bulkCreate(usersWithPasswords);
 
     // 5. Recipes + ingredients
     const recipesRaw = await loadJSON("recipes.json");
