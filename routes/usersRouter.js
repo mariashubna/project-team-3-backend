@@ -229,6 +229,8 @@ usersRouter.post(
  *             schema:
  *               type: object
  *               properties:
+ *                 id:
+ *                  type: integer
  *                 email:
  *                   type: string
  *                 avatar:

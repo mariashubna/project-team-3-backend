@@ -37,8 +37,9 @@ const loginController = async (req, res, next) => {
 
 
 const getCurrentController = async (req, res, next) => {
-  const { email, avatar, name } = req.user;
+  const { email, avatar, name, id } = req.user;
   res.json({
+    id,
     email,
     avatar,
     name,
