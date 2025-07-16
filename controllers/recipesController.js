@@ -1,7 +1,6 @@
 import * as recipesService from "../services/recipesServices.js";
 import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
-import { saveRecipeImage } from "../helpers/saveRecipeImage.js";
 
 const getRecipesByFilterController = async (req, res) => {
   const { page = 1, limit = 10, ...filter } = req.query;
@@ -95,10 +94,14 @@ const addRecipeController = async (req, res) => {
   const { id: owner } = req.user;
   let thumb = null;
 
-  // Створюємо рецепт спочатку без зображення, якщо немає файлу
-  // Або з тимчасовим шляхом, якщо файл є
+  // Якщо завантажено файл, використовуємо URL з Cloudinary
   if (req.file) {
-    thumb = req.file.path;
+    thumb = req.file.path; // Cloudinary повертає URL у path
+  }
+
+  // Перевіряємо, чи є зображення, оскільки воно обов'язкове
+  if (!thumb) {
+    throw HttpError(400, "Image is required for recipe creation");
   }
 
   // Зберігаємо в базі як thumb, але в API відповіді буде image
@@ -107,24 +110,6 @@ const addRecipeController = async (req, res) => {
     owner,
     thumb,
   });
-
-  // Якщо є файл зображення, зберігаємо його правильно і оновлюємо рецепт
-  if (req.file) {
-    try {
-      // Використовуємо нову функцію для збереження зображення
-      const imagePath = await saveRecipeImage(
-        newRecipe.id,
-        req.file.path,
-        req.file.originalname
-      );
-      
-      // Оновлюємо рецепт з новим шляхом до зображення
-      await recipesService.updateById(newRecipe.id, { thumb: imagePath });
-    } catch (error) {
-      console.error("Error saving recipe image:", error);
-      // Продовжуємо виконання, навіть якщо зображення не вдалося зберегти
-    }
-  }
 
   // Отримуємо повну інформацію про створений рецепт
   const completeRecipe = await recipesService.findById({
