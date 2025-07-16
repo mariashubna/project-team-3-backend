@@ -2,7 +2,7 @@ import express from "express";
 import recipesController from "../controllers/recipesController.js";
 import validateRecipeBody from "../helpers/validateRecipeBody.js";
 import authenticate from "../middleware/authenticate.js";
-import upload from "../middleware/upload.js";
+import { uploadRecipeImage } from "../middleware/upload.js";
 import { createRecipeSchema } from "../schemas/recipesSchemas.js";
 
 const recipesRouter = express.Router();
@@ -529,7 +529,7 @@ recipesRouter.get("/:id", recipesController.getRecipeController);
 recipesRouter.post(
   "/",
   authenticate,
-  upload.single("image"),
+  uploadRecipeImage.single("image"),
   validateRecipeBody(createRecipeSchema),
   recipesController.addRecipeController
 );

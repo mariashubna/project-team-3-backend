@@ -3,7 +3,7 @@ import validateBody from "../helpers/validateBody.js";
 import { loginSchema, registerSchema } from "../schemas/authSchema.js";
 import authController from "../controllers/authController.js";
 import authenticate from "../middleware/authenticate.js";
-import upload from "../middleware/upload.js";
+import { uploadAvatar } from "../middleware/upload.js";
 
 const usersRouter = express.Router();
 
@@ -301,7 +301,7 @@ usersRouter.get(
  */
 usersRouter.patch(
   "/avatars",
-  upload.single("avatar"),
+  uploadAvatar.single("avatar"),
   authenticate,
   authController.avatarsController
 );

@@ -12,8 +12,6 @@ import {
   getUserDetails
 } from "../services/authServices.js";
 
-import { saveAvatarToPublic } from "../helpers/saveAvatarFiles.js";
-
 
 const registerController = async (req, res, next) => {
   try {
@@ -63,10 +61,10 @@ const avatarsController = async (req, res, next) => {
   if (!req.file) {
     throw HttpError(400, "Avatar file is required");
   }
-  const tempUploadPath = req.file.path;
-  const originalName = req.file.originalname;
-
-  const avatarURL = await saveAvatarToPublic(id, tempUploadPath, originalName);
+  
+  // Cloudinary вже зберіг файл і повернув URL у req.file.path
+  const avatarURL = req.file.path;
+  
   const updatedUser = await changeAvatar(id, avatarURL); 
   res.json({
     avatar: avatarURL
