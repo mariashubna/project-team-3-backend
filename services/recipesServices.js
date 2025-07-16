@@ -90,6 +90,7 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
         model: Ingredient,
         as: "ingredients",
         where: { id: found.id },
+        attributes: ["id", "name", "desc", "img"],
         through: {
           attributes: ["measure"],
         },
