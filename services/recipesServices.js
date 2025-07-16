@@ -104,13 +104,15 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     where.owner = ownerId;
   }
 
-  const { count, rows } = await Recipe.findAndCountAll({
+  const rows = await Recipe.findAll({
     where,
     include,
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
   });
+
+  const count = await Recipe.count({where});
 
   return { count, rows };
 };
