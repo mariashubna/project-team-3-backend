@@ -1,6 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 
+const BASE_URL = process.env.APP_URL || `http://localhost:3000`;
+
 const avatarsDir = path.resolve("public", "avatars");
 
 export const saveAvatarToPublic = async (userId, tempPath, originalName) => {
@@ -10,5 +12,5 @@ export const saveAvatarToPublic = async (userId, tempPath, originalName) => {
 
   await fs.rename(tempPath, finalPath);
 
-  return `/avatars/${uniqueName}`;
+  return `${BASE_URL}/avatars/${uniqueName}`;
 };

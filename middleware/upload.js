@@ -1,23 +1,13 @@
 import multer from "multer";
-
-import { resolve } from "node:path";
 import HttpError from "../helpers/HttpError.js";
+import { avatarStorage, recipeStorage } from "../config/cloudinary.js";
 
-const tempDir = resolve("temp");
-
-const storage = multer.diskStorage({
-  destination: tempDir,
-  filename: (req, file, cb) => {
-    const uniquePrefix = `${Date.now()}_${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniquePrefix}_${file.originalname}`;
-    cb(null, filename);
-  },
-});
-
+// Обмеження розміру файлу
 const limits = {
-  fileSize: 1024 * 1024 * 10,
+  fileSize: 1024 * 1024 * 10, // 10 МБ
 };
 
+// Фільтр для перевірки типу файлу
 const fileFilter = (req, file, cb) => {
   const extension = file.originalname.split(".").pop().toLowerCase();
   
@@ -25,16 +15,25 @@ const fileFilter = (req, file, cb) => {
   const allowedExtensions = ["jpg", "jpeg", "png"];
   
   if (!allowedExtensions.includes(extension)) {
-    return cb(HttpError(400, `Unsupported file format. Allowed formats: ${allowedExtensions.join(", ")}`));
+    return cb(HttpError(400, `Unsupported file format. Allowed formats: ${allowedExtensions.join(", ")}`))
   }
   
   cb(null, true);
 };
 
-const upload = multer({
-  storage,
+// Middleware для завантаження аватарок
+const uploadAvatar = multer({
+  storage: avatarStorage,
   limits,
   fileFilter,
 });
 
-export default upload;
+// Middleware для завантаження зображень рецептів
+const uploadRecipeImage = multer({
+  storage: recipeStorage,
+  limits,
+  fileFilter,
+});
+
+export { uploadAvatar, uploadRecipeImage };
+export default uploadAvatar; // Для зворотної сумісності
