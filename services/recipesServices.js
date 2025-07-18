@@ -189,7 +189,8 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
-    distinct: true, // дуже важливо для правильного підрахунку унікальних рецептів
+    distinct: true,
+    subQuery: false,
   });
 
   return { count, rows };
