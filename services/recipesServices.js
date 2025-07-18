@@ -43,9 +43,9 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
   const { category, ingredient, area, ownerId } = filter;
 
   const include = buildRecipiesAssosiations();
+
   const where = {};
 
-  // Категория
   if (category) {
     const found = await Category.findOne({
       where: {
@@ -62,7 +62,6 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     }
   }
 
-  // Регион
   if (area) {
     const found = await Area.findOne({
       where: {
@@ -79,7 +78,6 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     }
   }
 
-  // Ингредиент
   if (ingredient) {
     const found = await Ingredient.findOne({
       where: {
@@ -88,25 +86,15 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     });
 
     if (found) {
-      // Найдём include ингредиентов и добавим `where` вместо дублирования
-      const ingInclude = include.find((i) => i.as === "ingredients");
-
-      if (ingInclude) {
-        ingInclude.where = { id: found.id };
-        ingInclude.required = true; // гарантирует INNER JOIN (чтобы count был точным)
-      } else {
-        // fallback на случай если buildRecipiesAssosiations() изменился
-        include.push({
-          model: Ingredient,
-          as: "ingredients",
-          where: { id: found.id },
-          attributes: ["id", "name", "desc", "img"],
-          through: {
-            attributes: ["measure"],
-          },
-          required: true,
-        });
-      }
+      include.push({
+        model: Ingredient,
+        as: "ingredients",
+        where: { id: found.id },
+        attributes: ["id", "name", "desc", "img"],
+        through: {
+          attributes: ["measure"],
+        },
+      });
     } else {
       return emptyResponse;
     }
@@ -116,95 +104,16 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     where.owner = ownerId;
   }
 
-  // Основной запрос
   const { count, rows } = await Recipe.findAndCountAll({
     where,
     include,
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
-    distinct: true,
-    subQuery: false, // фикс для корректного join + count
   });
 
   return { count, rows };
 };
-
-// export const getRecipesByFilter = async ({ filter, skip, limit }) => {
-//   const { category, ingredient, area, ownerId } = filter;
-
-//   const include = buildRecipiesAssosiations();
-
-//   const where = {};
-
-//   if (category) {
-//     const found = await Category.findOne({
-//       where: {
-//         name: {
-//           [Op.iLike]: `%${category}%`,
-//         },
-//       },
-//     });
-
-//     if (found) {
-//       where.categoryId = found.id;
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (area) {
-//     const found = await Area.findOne({
-//       where: {
-//         name: {
-//           [Op.iLike]: `%${area}%`,
-//         },
-//       },
-//     });
-
-//     if (found) {
-//       where.areaId = found.id;
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (ingredient) {
-//     const found = await Ingredient.findOne({
-//       where: {
-//         name: { [Op.iLike]: `%${ingredient}%` },
-//       },
-//     });
-
-//     if (found) {
-//       include.push({
-//         model: Ingredient,
-//         as: "ingredients",
-//         where: { id: found.id },
-//         attributes: ["id", "name", "desc", "img"],
-//         through: {
-//           attributes: ["measure"],
-//         },
-//       });
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (ownerId) {
-//     where.owner = ownerId;
-//   }
-
-//   const { count, rows } = await Recipe.findAndCountAll({
-//     where,
-//     include,
-//     offset: skip,
-//     limit,
-//     order: [["createdAt", "DESC"]],
-//   });
-
-//   return { count, rows };
-// };
 
 export const findById = async ({ id }) => {
   const recipe = await Recipe.findByPk(id, {
@@ -339,7 +248,6 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
     offset: skip,
     limit: validLimit,
     order: [["createdAt", "DESC"]],
-    distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
   });
 
   return { count, rows };
