@@ -110,6 +110,7 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
+    distinct: true,
   });
 
   const count = await Recipe.count({where});
@@ -165,7 +166,7 @@ export const getPopular = async ({ skip, limit }) => {
   };
 };
 
-const getRecipesByIds = async (ids) => { 
+const getRecipesByIds = async (ids) => {
   return await Recipe.findAll({
     where: { id: ids },
     include: buildRecipiesAssosiations(),
@@ -188,7 +189,7 @@ export const addToFavorites = async ({ recipeId, userId }) => {
   }
 
   return favorite;
-}
+};
 
 export const addRecipe = async (data) => {
   const { ingredients, ...recipeData } = data;
@@ -210,23 +211,23 @@ export const addRecipe = async (data) => {
 // Видалити рецепт
 const removeRecipe = async (recipeId, userId) => {
   // Перевіряємо, чи існує рецепт і чи належить він користувачу
-  const recipe = await Recipe.findOne({ 
-    where: { 
+  const recipe = await Recipe.findOne({
+    where: {
       id: recipeId,
-      owner: userId 
-    } 
+      owner: userId,
+    },
   });
-  
+
   if (!recipe) {
     return null;
   }
-  
+
   // Видаляємо зв'язки з інгредієнтами
   await RecipeIngredient.destroy({ where: { recipeId } });
-  
+
   // Видаляємо сам рецепт
   await recipe.destroy();
-  
+
   return recipe;
 };
 
@@ -237,13 +238,13 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
   // Перетворюємо параметри на числа і перевіряємо на NaN
   const pageNum = Number(page);
   const limitNum = Number(limit);
-  
+
   // Якщо параметри не є числами, використовуємо значення за замовчуванням
   const validPage = isNaN(pageNum) ? 1 : pageNum;
   const validLimit = isNaN(limitNum) ? 10 : limitNum;
-  
+
   const skip = (validPage - 1) * validLimit;
-  
+
   const { count, rows } = await Recipe.findAndCountAll({
     where: { owner: userId },
     include: buildRecipiesAssosiations(),
@@ -252,7 +253,7 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
     order: [["createdAt", "DESC"]],
     distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
   });
-  
+
   return { count, rows };
 };
 
@@ -265,13 +266,13 @@ export const removeFromFavorites = async ({ recipeId, userId }) => {
 };
 
 export const getMyFavorites = async ({ userId, skip, limit }) => {
-  let {count, rows} = await FavoriteRecipe.findAndCountAll({
+  let { count, rows } = await FavoriteRecipe.findAndCountAll({
     where: { userId },
     attributes: ["recipeId"],
     limit,
     offset: skip,
   });
-  
+
   const ids = rows.map((r) => r.recipeId);
 
   rows = await getRecipesByIds(ids);
