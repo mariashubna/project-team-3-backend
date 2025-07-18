@@ -49,24 +49,19 @@ const seed = async () => {
   try {
     await sequelize.sync({ force: true });
 
-    // 1. Areas
     const areas = await loadJSON("areas.json");
     await Area.bulkCreate(areas);
 
-    // 2. Categories
     const categories = await loadJSON("categories.json");
     await Category.bulkCreate(categories);
 
-    // 3. Ingredients
     const ingredients = await loadJSON("ingredients.json");
     await Ingredient.bulkCreate(ingredients);
 
-    // 4. Users
     const users = await loadJSON("users.json");
     const defaultPassword =
       "$2b$10$bFpf5Jp57HjL9iMxnityV.8v3qLQ5nlmv7ZlGBpRSEclmudNjr4j2";
 
-    // Add default password if not present
     const usersWithPasswords = users.map((user) => ({
       ...user,
       password: user.password || defaultPassword,
@@ -74,7 +69,6 @@ const seed = async () => {
 
     await User.bulkCreate(usersWithPasswords);
 
-    // 5. Recipes + ingredients
     const recipesRaw = await loadJSON("recipes.json");
     const usersRaw = await loadJSON("users.json");
     const ingredientsRaw = await loadJSON("ingredients.json");
@@ -90,18 +84,15 @@ const seed = async () => {
     const userIdMap = createUserIdMap(usersRaw, allUsers);
 
     for (const recipe of recipesRaw) {
-      // Extract owner OID from recipe
       const ownerOid = recipe.owner?.$oid;
-      // Find owner in userIdMap
+
       const owner = userIdMap[ownerOid];
       if (!owner) continue;
 
-      // Find category and area by name
       const category = allCategories.find((c) => c.name === recipe.category);
       const area = allAreas.find((a) => a.name === recipe.area);
       if (!category || !area) continue;
 
-      // Convert createdAt and updatedAt from MongoDB format to Date
       let createdAt, updatedAt;
       if (recipe.createdAt?.$date?.$numberLong) {
         createdAt = new Date(Number(recipe.createdAt.$date.$numberLong));
@@ -110,7 +101,6 @@ const seed = async () => {
         updatedAt = new Date(Number(recipe.updatedAt.$date.$numberLong));
       }
 
-      // Create recipe (without ingredients, owner, category, area, createdAt, updatedAt)
       const {
         ingredients: recipeIngs,
         owner: _,
@@ -154,7 +144,6 @@ const seed = async () => {
       }
     }
 
-    // 6. Testimonials
     const testimonialsRaw = await loadJSON("testimonials.json");
     const testimonialsToInsert = [];
 

@@ -39,84 +39,6 @@ function buildRecipiesAssosiations() {
   ];
 }
 
-// export const getRecipesByFilter = async ({ filter, skip, limit }) => {
-//   const { category, ingredient, area, ownerId } = filter;
-
-//   const include = buildRecipiesAssosiations();
-
-//   const where = {};
-
-//   if (category) {
-//     const found = await Category.findOne({
-//       where: {
-//         name: {
-//           [Op.iLike]: `%${category}%`,
-//         },
-//       },
-//     });
-
-//     if (found) {
-//       where.categoryId = found.id;
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (area) {
-//     const found = await Area.findOne({
-//       where: {
-//         name: {
-//           [Op.iLike]: `%${area}%`,
-//         },
-//       },
-//     });
-
-//     if (found) {
-//       where.areaId = found.id;
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (ingredient) {
-//     const found = await Ingredient.findOne({
-//       where: {
-//         name: { [Op.iLike]: `%${ingredient}%` },
-//       },
-//     });
-
-//     if (found) {
-//       include.push({
-//         model: Ingredient,
-//         as: "ingredients",
-//         where: { id: found.id },
-//         attributes: ["id", "name", "desc", "img"],
-//         through: {
-//           attributes: ["measure"],
-//         },
-//       });
-//     } else {
-//       return emptyResponse;
-//     }
-//   }
-
-//   if (ownerId) {
-//     where.owner = ownerId;
-//   }
-
-//   const rows = await Recipe.findAll({
-//     where,
-//     include,
-//     offset: skip,
-//     limit,
-//     order: [["createdAt", "DESC"]],
-//   });
-
-//   const count = await Recipe.count({ where });
-
-//   return { count, rows };
-// };
-
 export const getRecipesByFilter = async ({ filter, skip, limit }) => {
   const { category, ingredient, area, ownerId } = filter;
 
@@ -167,7 +89,7 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
       include.push({
         model: Ingredient,
         as: "ingredients",
-        where: { id: found.id }, // Важливо: це додає умову у join
+        where: { id: found.id },
         attributes: ["id", "name", "desc", "img"],
         through: {
           attributes: ["measure"],
@@ -182,18 +104,6 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     where.owner = ownerId;
   }
 
-  // // Замість двох окремих запитів для rows і count, робимо findAndCountAll
-  // const { count, rows } = await Recipe.findAndCountAll({
-  //   where,
-  //   include,
-  //   offset: skip,
-  //   limit,
-  //   order: [["createdAt", "DESC"]],
-  //   distinct: true,
-  // });
-
-  // return { count, rows };
-
   const filteredRecipes = await Recipe.findAll({
     where,
     include,
@@ -207,7 +117,6 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     return emptyResponse;
   }
 
-  // 2. Потом берем нужную страницу с пагинацией
   const rows = await Recipe.findAll({
     where,
     include,
@@ -310,9 +219,7 @@ export const addRecipe = async (data) => {
   return newRecipe;
 };
 
-// Видалити рецепт
 const removeRecipe = async (recipeId, userId) => {
-  // Перевіряємо, чи існує рецепт і чи належить він користувачу
   const recipe = await Recipe.findOne({
     where: {
       id: recipeId,
@@ -324,10 +231,8 @@ const removeRecipe = async (recipeId, userId) => {
     return null;
   }
 
-  // Видаляємо зв'язки з інгредієнтами
   await RecipeIngredient.destroy({ where: { recipeId } });
 
-  // Видаляємо сам рецепт
   await recipe.destroy();
 
   return recipe;
@@ -335,13 +240,10 @@ const removeRecipe = async (recipeId, userId) => {
 
 export const removeRecipeById = removeRecipe;
 
-// Отримати власні рецепти користувача
 export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
-  // Перетворюємо параметри на числа і перевіряємо на NaN
   const pageNum = Number(page);
   const limitNum = Number(limit);
 
-  // Якщо параметри не є числами, використовуємо значення за замовчуванням
   const validPage = isNaN(pageNum) ? 1 : pageNum;
   const validLimit = isNaN(limitNum) ? 10 : limitNum;
 
@@ -353,7 +255,7 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
     offset: skip,
     limit: validLimit,
     order: [["createdAt", "DESC"]],
-    distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
+    distinct: true,
   });
 
   return { count, rows };

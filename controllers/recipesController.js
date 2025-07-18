@@ -33,7 +33,7 @@ const mapToResponse = (recipe) => {
     },
     instructions: recipe.instructions,
     description: recipe.description,
-    image: recipe.thumb, // Змінено з recipe.image на recipe.thumb для відповідності структурі даних
+    image: recipe.thumb,
     time: recipe.time,
     owner: {
       id: recipe.user.id,
@@ -88,39 +88,32 @@ const getPopularController = async (req, res) => {
     recipes,
   });
 };
-// Додати рецепт
 
 const addRecipeController = async (req, res) => {
   const { id: owner } = req.user;
   let thumb = null;
 
-  // Якщо завантажено файл, використовуємо URL з Cloudinary
   if (req.file) {
-    thumb = req.file.path; // Cloudinary повертає URL у path
+    thumb = req.file.path;
   }
 
-  // Перевіряємо, чи є зображення, оскільки воно обов'язкове
   if (!thumb) {
     throw HttpError(400, "Image is required for recipe creation");
   }
 
-  // Зберігаємо в базі як thumb, але в API відповіді буде image
   const newRecipe = await recipesService.addRecipe({
     ...req.body,
     owner,
     thumb,
   });
 
-  // Отримуємо повну інформацію про створений рецепт
   const completeRecipe = await recipesService.findById({
-    id: newRecipe.id
+    id: newRecipe.id,
   });
 
-  // Використовуємо mapToResponse для форматування відповіді
   res.status(201).json(mapToResponse(completeRecipe));
 };
 
-// Видалити рецепт
 const removeRecipeController = async (req, res) => {
   const { id } = req.params;
   const { id: userId } = req.user;
@@ -137,17 +130,13 @@ const removeRecipeController = async (req, res) => {
   res.status(200).json({ message: "Recipe deleted successfully" });
 };
 
-// Отримати список своїх рецептів
-// +ПАГІНАЦІЯ
 const getMyRecipeController = async (req, res) => {
   const { id: userId } = req.user;
   const { page = 1, limit = 10 } = req.query;
 
-  // Перетворюємо параметри на числа і перевіряємо на NaN
   const pageNum = Number(page);
   const limitNum = Number(limit);
 
-  // Якщо параметри не є числами, використовуємо значення за замовчуванням
   const validPage = isNaN(pageNum) ? 1 : pageNum;
   const validLimit = isNaN(limitNum) ? 10 : limitNum;
 
@@ -156,7 +145,6 @@ const getMyRecipeController = async (req, res) => {
     limit: validLimit,
   });
 
-  // Використовуємо mapToResponse для форматування рецептів
   const recipes = rows.map(mapToResponse);
 
   res.status(200).json({
