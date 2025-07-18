@@ -182,15 +182,39 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     where.owner = ownerId;
   }
 
-  // Замість двох окремих запитів для rows і count, робимо findAndCountAll
-  const { count, rows } = await Recipe.findAndCountAll({
+  // // Замість двох окремих запитів для rows і count, робимо findAndCountAll
+  // const { count, rows } = await Recipe.findAndCountAll({
+  //   where,
+  //   include,
+  //   offset: skip,
+  //   limit,
+  //   order: [["createdAt", "DESC"]],
+  //   distinct: true,
+  // });
+
+  // return { count, rows };
+
+  const filteredRecipes = await Recipe.findAll({
+    where,
+    include,
+    attributes: ["id"],
+    distinct: true,
+  });
+
+  const count = filteredRecipes.length;
+
+  if (count === 0) {
+    return emptyResponse;
+  }
+
+  // 2. Потом берем нужную страницу с пагинацией
+  const rows = await Recipe.findAll({
     where,
     include,
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
     distinct: true,
-    subQuery: false,
   });
 
   return { count, rows };
