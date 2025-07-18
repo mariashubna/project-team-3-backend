@@ -9,13 +9,12 @@ import {
   getFollowing,
   followUser,
   unfollowUser,
-  getUserDetails
+  getUserDetails,
 } from "../services/authServices.js";
-
 
 const registerController = async (req, res, next) => {
   try {
-    const {token, user} = await registerUser(req.body);
+    const { token, user } = await registerUser(req.body);
     res.status(201).json({
       token,
       user: {
@@ -29,12 +28,10 @@ const registerController = async (req, res, next) => {
   }
 };
 
-
 const loginController = async (req, res, next) => {
   const { token, user } = await loginUser(req.body);
   res.json({ token, user });
 };
-
 
 const getCurrentController = async (req, res, next) => {
   const { email, avatar, name, id } = req.user;
@@ -46,7 +43,6 @@ const getCurrentController = async (req, res, next) => {
   });
 };
 
-
 const getDetailsController = async (req, res, next) => {
   const currentUserId = req.user.id;
   const targetUserId = req.params.userId;
@@ -55,23 +51,20 @@ const getDetailsController = async (req, res, next) => {
   res.json(userDetails);
 };
 
-
 const avatarsController = async (req, res, next) => {
   const { id } = req.user;
 
   if (!req.file) {
     throw HttpError(400, "Avatar file is required");
   }
-  
-  // Cloudinary вже зберіг файл і повернув URL у req.file.path
+
   const avatarURL = req.file.path;
-  
-  const updatedUser = await changeAvatar(id, avatarURL); 
+
+  const updatedUser = await changeAvatar(id, avatarURL);
   res.json({
-    avatar: avatarURL
+    avatar: avatarURL,
   });
 };
-
 
 const getFollowersController = async (req, res, next) => {
   const userId = req.params.userId;
@@ -84,7 +77,6 @@ const getFollowersController = async (req, res, next) => {
   res.json(data);
 };
 
-
 const getFollowingController = async (req, res, next) => {
   const userId = req.user.id;
 
@@ -96,16 +88,13 @@ const getFollowingController = async (req, res, next) => {
   res.json(data);
 };
 
-
 const followUserController = async (req, res, next) => {
-
   const userId = req.user.id;
   const targetUserId = req.params.userId;
 
   const result = await followUser(userId, targetUserId);
   res.status(200).json(result);
 };
-
 
 const unfollowUserController = async (req, res, next) => {
   const userId = req.user.id;
@@ -117,7 +106,7 @@ const unfollowUserController = async (req, res, next) => {
 
 const logoutController = async (req, res) => {
   const { email } = req.user;
-  await logoutUser({email});
+  await logoutUser({ email });
   res.status(204).send();
 };
 
