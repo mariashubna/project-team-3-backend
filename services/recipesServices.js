@@ -104,13 +104,15 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
     where.owner = ownerId;
   }
 
-  const { count, rows } = await Recipe.findAndCountAll({
+  const rows = await Recipe.findAll({
     where,
     include,
     offset: skip,
     limit,
     order: [["createdAt", "DESC"]],
   });
+
+  const count = await Recipe.count({ where });
 
   return { count, rows };
 };
@@ -248,6 +250,7 @@ export const getMyRecipes = async (userId, { page = 1, limit = 10 } = {}) => {
     offset: skip,
     limit: validLimit,
     order: [["createdAt", "DESC"]],
+    distinct: true, // Додаємо опцію distinct: true для правильного підрахунку унікальних рецептів
   });
 
   return { count, rows };
