@@ -8,6 +8,7 @@ import RecipeIngredient from "../db/models/RecipeIngredient.js";
 import "../db/models/associations.js";
 import FavoriteRecipe from "../db/models/FavoriteRecipe.js";
 import sequelize from "../db/Sequelize.js";
+import { col, fn, literal, where as whereFn } from "sequelize";
 
 const emptyResponse = { count: 0, rows: [] };
 
@@ -40,82 +41,53 @@ function buildRecipiesAssosiations() {
 }
 
 export const getRecipesByFilter = async ({ filter, skip, limit }) => {
-  const { category, ingredient, area, ownerId } = filter;
-
+  const { category, ingredient, area, ownerId } = filter || {};
   const include = buildRecipiesAssosiations();
-
   const where = {};
 
-  if (category) {
-    const found = await Category.findOne({
-      where: {
-        name: {
-          [Op.iLike]: `%${category}%`,
-        },
-      },
-    });
+  const [foundCategory, foundArea, foundIngredient] = await Promise.all([
+    category
+      ? Category.findOne({
+          where: whereFn(fn("LOWER", col("name")), category.toLowerCase()),
+        })
+      : null,
+    area
+      ? Area.findOne({
+          where: whereFn(fn("LOWER", col("name")), area.toLowerCase()),
+        })
+      : null,
+    ingredient
+      ? Ingredient.findOne({
+          where: whereFn(fn("LOWER", col("name")), ingredient.toLowerCase()),
+        })
+      : null,
+  ]);
 
-    if (found) {
-      where.categoryId = found.id;
-    } else {
-      return emptyResponse;
-    }
+  if (category && !foundCategory) return emptyResponse;
+  if (area && !foundArea) return emptyResponse;
+  if (ingredient && !foundIngredient) return emptyResponse;
+
+  if (foundCategory) where.categoryId = foundCategory.id;
+  if (foundArea) where.areaId = foundArea.id;
+  if (ownerId) where.owner = ownerId;
+
+  if (foundIngredient) {
+    const ingredientFilter = literal(`EXISTS (
+      SELECT 1
+      FROM recipe_ingredients AS ri
+      WHERE ri."recipeId" = "recipe"."id" AND ri."ingredientId" = ${foundIngredient.id}
+    )`);
+    where[Op.and] = where[Op.and] ? [...where[Op.and], ingredientFilter] : [ingredientFilter];
   }
 
-  if (area) {
-    const found = await Area.findOne({
-      where: {
-        name: {
-          [Op.iLike]: `%${area}%`,
-        },
-      },
-    });
-
-    if (found) {
-      where.areaId = found.id;
-    } else {
-      return emptyResponse;
-    }
-  }
-
-  if (ingredient) {
-    const found = await Ingredient.findOne({
-      where: {
-        name: { [Op.iLike]: `%${ingredient}%` },
-      },
-    });
-
-    if (found) {
-      include.push({
-        model: Ingredient,
-        as: "ingredients",
-        where: { id: found.id },
-        attributes: ["id", "name", "desc", "img"],
-        through: {
-          attributes: ["measure"],
-        },
-      });
-    } else {
-      return emptyResponse;
-    }
-  }
-
-  if (ownerId) {
-    where.owner = ownerId;
-  }
-
-  const filteredRecipes = await Recipe.findAll({
+  const count = await Recipe.count({
     where,
     include,
-    attributes: ["id"],
     distinct: true,
+    col: "id",
   });
 
-  const count = filteredRecipes.length;
-
-  if (count === 0) {
-    return emptyResponse;
-  }
+  if (count === 0) return emptyResponse;
 
   const rows = await Recipe.findAll({
     where,
@@ -128,6 +100,7 @@ export const getRecipesByFilter = async ({ filter, skip, limit }) => {
 
   return { count, rows };
 };
+
 
 export const findById = async ({ id }) => {
   const recipe = await Recipe.findByPk(id, {

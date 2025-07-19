@@ -25,17 +25,17 @@ const recipesRouter = express.Router();
  *         name: category
  *         schema:
  *           type: string
- *         description: Filter by category name (like and case-insensitive)
+ *         description: Filter by category name (case-insensitive)
  *       - in: query
  *         name: ingredient
  *         schema:
  *           type: string
- *         description: Filter by ingredient name (like and case-insensitive)
+ *         description: Filter by ingredient name (case-insensitive)
  *       - in: query
  *         name: area
  *         schema:
  *           type: string
- *         description: Filter by area name (like and case-insensitive)
+ *         description: Filter by area name (case-insensitive)
  *       - in: query
  *         name: ownerId
  *         schema:
