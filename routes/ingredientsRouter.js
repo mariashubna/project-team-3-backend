@@ -11,6 +11,22 @@ const ingredientsRouter = express.Router();
  *       - Ingredients
  *     summary: Get all ingredients
  *     description: Returns a list of all available ingredients
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by category name (case-insensitive) assigned reciepts
+  *       - in: query
+ *         name: area
+ *         schema:
+ *           type: string
+ *         description: Filter by area name (case-insensitive) assigned reciepts
+ *       - in: query
+ *         name: assignedToRecipes
+ *         schema:
+ *           type: boolean
+ *         description: Filter areas that are assigned to recipes
  *     responses:
  *       200:
  *         description: Successful response
