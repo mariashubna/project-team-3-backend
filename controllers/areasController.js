@@ -2,7 +2,8 @@ import ctrlWrapper from "../helpers/ctrlWrapper.js";
 import { getAllAreas } from "../services/areasServices.js";
 
 const getAreasController = async (req, res, next) => {
-  const result = await getAllAreas();
+  const {...filter} = req.query;
+  const result = await getAllAreas({filter});
   res.json(result);
 };
 

@@ -16,6 +16,22 @@ const areasRouter = express.Router();
  *   get:
  *     summary: Get all areas (regions of origin)
  *     tags: [Areas]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by category name (case-insensitive) assigned reciepts
+  *       - in: query
+ *         name: ingridient
+ *         schema:
+ *           type: string
+ *         description: Filter by ingridient name (case-insensitive) assigned reciepts
+ *       - in: query
+ *         name: assignedToRecipes
+ *         schema:
+ *           type: boolean
+ *         description: Filter areas that are assigned to recipes
  *     responses:
  *       200:
  *         description: List of all areas (regions)
