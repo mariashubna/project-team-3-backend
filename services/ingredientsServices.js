@@ -15,7 +15,7 @@ ${whereCase}
 ORDER BY I.ID;
 `;
 
-export const getAllIngredients = async ({ filter }) => {
+export const getAllIngredients = async ({ filter = {} } = {}) => {
   const { category, area, assignedToRecipes } = filter;
 
   if (category || area || (assignedToRecipes?.toLowerCase() === "true")) {

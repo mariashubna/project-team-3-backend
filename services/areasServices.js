@@ -15,10 +15,8 @@ ${whereCase}
 ORDER BY A.ID;
 `
 
-export const getAllAreas = async ({ filter }) => {
+export const getAllAreas = async ({ filter = {} } = {}) => {
   const { category, ingridient, assignedToRecipes } = filter;
-
-  console.log(`category ${category}, ingridient ${ingridient}, assignedToRecipe ${assignedToRecipes}`)
 
   if (category || ingridient || (assignedToRecipes?.toLowerCase() === "true")) {
     var where = category ? `\n AND LOWER(C.NAME)=LOWER('${category}') \n` : "";
