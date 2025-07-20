@@ -152,7 +152,7 @@ export const getFollowers = async (userId, page = 1, limit = 5) => {
       const recipes = await Recipe.findAll({
         where: { owner: follower.id },
         attributes: ["thumb"],
-        limit: 3,
+        limit: 4,
       })
 
       return {
@@ -192,7 +192,7 @@ export const getFollowing = async (userId, page = 1, limit = 5) => {
   const following = await Promise.all(
     rawFollowing.map(async (followedUser) => {
       const recipes = await followedUser.getRecipes({
-        limit: 3,
+        limit: 4,
         order: [["createdAt", "DESC"]],
         attributes: ["thumb"],
       });
